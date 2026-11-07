@@ -1,0 +1,1333 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="UTF-8">
+<title>Manual visual — Teste de login com Selenium WebDriver</title>
+<style>
+  @page { size: A4; margin: 0; }
+  * { box-sizing: border-box; }
+  html, body { margin: 0; padding: 0; background: #fff; }
+  body {
+    font-family: Inter, "Noto Sans", sans-serif;
+    color: #0f172a;
+    -webkit-print-color-adjust: exact;
+    print-color-adjust: exact;
+  }
+  .page {
+    width: 210mm;
+    height: 297mm;
+    overflow: hidden;
+    position: relative;
+    background: #f4f7fb;
+    padding: 8mm 7mm 5.5mm;
+    display: flex;
+    flex-direction: column;
+    gap: 2.6mm;
+    break-after: page;
+    page-break-after: always;
+  }
+  .page:last-child { break-after: auto; page-break-after: auto; }
+  .page::before {
+    content: "";
+    position: absolute;
+    top: 0; left: 0; right: 0;
+    height: 3.2mm;
+    background: linear-gradient(90deg, #1d4ed8 0%, #0ea5e9 100%);
+  }
+
+  .top { display: grid; grid-template-columns: 1.45fr 0.9fr; gap: 3.2mm; align-items: stretch; }
+  .kicker {
+    display: inline-flex;
+    align-items: center;
+    gap: 6px;
+    background: #1d4ed8;
+    color: #fff;
+    font-size: 8px;
+    font-weight: 800;
+    letter-spacing: 0.12em;
+    padding: 3px 8px;
+    border-radius: 999px;
+    margin-bottom: 1.6mm;
+  }
+  h1 {
+    margin: 0;
+    font-size: 26px;
+    line-height: 0.92;
+    letter-spacing: -0.035em;
+    font-weight: 800;
+    color: #0b3f91;
+    text-transform: uppercase;
+  }
+  .sub { margin: 1.6mm 0 0; font-size: 10px; line-height: 1.35; color: #334155; max-width: 118mm; }
+
+  .learn {
+    background: #fff;
+    border: 1.5px solid #bfdbfe;
+    border-radius: 10px;
+    padding: 2.4mm 3mm 2.2mm;
+    box-shadow: 0 1px 0 rgba(15, 23, 42, 0.03);
+  }
+  .learn h2 {
+    margin: 0 0 1.6mm;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    font-size: 9px;
+    letter-spacing: 0.08em;
+    color: #1d4ed8;
+  }
+  .learn ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.15mm; }
+  .learn li { display: flex; gap: 5px; align-items: flex-start; font-size: 9px; line-height: 1.25; color: #1e293b; }
+
+  .tick, .cross {
+    width: 12px; height: 12px; border-radius: 50%;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none; margin-top: 1px;
+  }
+  .tick { background: #059669; }
+  .cross { background: #e11d48; }
+  .tick::after {
+    content: "";
+    width: 5px; height: 3px;
+    border-left: 1.5px solid #fff;
+    border-bottom: 1.5px solid #fff;
+    transform: rotate(-45deg) translate(0.5px, -0.5px);
+  }
+  .cross { position: relative; }
+  .cross::before, .cross::after {
+    content: "";
+    position: absolute;
+    left: 3px;
+    top: 5.2px;
+    width: 6px;
+    height: 1.5px;
+    background: #fff;
+  }
+  .cross::before { transform: rotate(45deg); }
+  .cross::after { transform: rotate(-45deg); }
+
+  .mid { flex: 0 0 auto; min-height: 0; display: grid; gap: 2.5mm; align-items: start; }
+  .g2 { grid-template-columns: 1fr 1fr; }
+  .g3 { grid-template-columns: 1fr 1fr 1fr; }
+  .rows-a, .rows-b, .rows-c, .rows-d { grid-template-rows: auto auto; align-items: start; }
+  .phases, .symptoms, .events, .split, .flow { align-items: stretch; }
+  .symptoms, .events, .phases { align-items: stretch; }
+  .wide { grid-column: 1 / -1; }
+  .tall { grid-row: 1 / span 2; }
+
+  .card {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 2.4mm 2.8mm 2.2mm;
+    min-height: 0;
+    display: flex;
+    flex-direction: column;
+    gap: 1.6mm;
+    box-shadow: 0 1px 2px rgba(15, 23, 42, 0.04);
+  }
+  .card.bad { background: #fff5f5; border-color: #fecdd3; }
+  .card.good { background: #f0fdf4; border-color: #bbf7d0; }
+  .card.info { background: #f8fbff; border-color: #dbeafe; }
+  .sh { display: flex; gap: 2mm; align-items: flex-start; }
+  .num {
+    width: 18px; height: 18px; border-radius: 50%;
+    background: #1d4ed8; color: #fff;
+    font-size: 10px; font-weight: 800;
+    display: inline-flex; align-items: center; justify-content: center;
+    flex: none;
+  }
+  .num.red { background: #e11d48; }
+  .num.green { background: #059669; }
+  .num.amber { background: #d97706; }
+  .sh b { display: block; font-size: 10.5px; letter-spacing: 0.02em; color: #0f2744; line-height: 1.15; text-transform: uppercase; }
+  .sh em { display: block; margin-top: 1px; font-style: normal; font-size: 8.5px; color: #64748b; line-height: 1.25; font-weight: 500; }
+  .body { font-size: 9.4px; line-height: 1.35; color: #1e293b; }
+  .body p { margin: 0 0 1.2mm; }
+  .body p:last-child { margin: 0; }
+  ul.clean { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.1mm; }
+  ul.clean li { display: flex; gap: 5px; align-items: flex-start; font-size: 9.2px; line-height: 1.3; }
+  code, .mono { font-family: "JetBrains Mono", ui-monospace, monospace; }
+
+  .flow { display: flex; align-items: stretch; gap: 1.2mm; min-height: 0; }
+  .step {
+    flex: 1;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 1.6mm 1.5mm 1.5mm;
+    display: flex;
+    flex-direction: column;
+    gap: 0.8mm;
+  }
+  .step .n {
+    width: 16px; height: 16px; border-radius: 50%;
+    background: #1d4ed8; color: #fff;
+    font-size: 9px; font-weight: 800;
+    display: inline-flex; align-items: center; justify-content: center;
+  }
+  .step strong { font-size: 8.6px; line-height: 1.15; color: #0f2744; }
+  .step span { font-size: 7.8px; line-height: 1.25; color: #475569; }
+  .arrow {
+    align-self: center;
+    color: #94a3b8;
+    font-size: 12px;
+    font-weight: 700;
+  }
+
+  .snippet { border-radius: 8px; overflow: hidden; border: 1px solid #1e293b; min-height: 0; display: flex; flex-direction: column; }
+  .snippet-bar {
+    background: #111827;
+    color: #cbd5e1;
+    font-size: 8px;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+    padding: 3px 8px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .dots { display: inline-flex; gap: 3px; }
+  .dots i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+  .dots i:nth-child(1) { background: #fb7185; }
+  .dots i:nth-child(2) { background: #fbbf24; }
+  .dots i:nth-child(3) { background: #34d399; }
+  .tag { margin-left: auto; border-radius: 999px; padding: 1px 6px; font-size: 7.5px; font-weight: 700; letter-spacing: 0.04em; }
+  .tag.err { background: #9f1239; color: #ffe4e6; }
+  .tag.ok { background: #065f46; color: #d1fae5; }
+  pre {
+    margin: 0;
+    background: #0b1220;
+    color: #e2e8f0;
+    padding: 6px 8px 7px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 8.4px;
+    line-height: 1.45;
+    white-space: pre-wrap;
+  }
+  .kw { color: #93c5fd; }
+  .fn { color: #fde68a; }
+  .st { color: #86efac; }
+  .cm { color: #94a3b8; }
+  .badl { color: #fda4af; }
+  .goodl { color: #6ee7b7; }
+
+  .browser {
+    border: 1px solid #cbd5e1;
+    border-radius: 8px;
+    overflow: hidden;
+    background: #fff;
+  }
+  .chrome {
+    background: #e2e8f0;
+    display: flex;
+    align-items: center;
+    gap: 4px;
+    padding: 3px 6px;
+  }
+  .chrome i { width: 6px; height: 6px; border-radius: 50%; background: #94a3b8; display: block; }
+  .url {
+    flex: 1;
+    background: #fff;
+    border-radius: 999px;
+    font-size: 7.5px;
+    color: #334155;
+    padding: 1px 6px;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+  }
+  .screen { padding: 2mm 2.2mm 2.2mm; display: flex; flex-direction: column; gap: 1.1mm; }
+  .fieldlab { display: flex; justify-content: space-between; font-size: 7.6px; color: #64748b; font-weight: 700; }
+  .fieldlab code { color: #1d4ed8; font-size: 7.4px; }
+  .field { height: 14px; border: 1px solid #cbd5e1; border-radius: 4px; background: #f8fafc; }
+  .hello {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 6px;
+    padding: 1.4mm 2mm;
+    font-size: 10px;
+    font-weight: 700;
+    color: #065f46;
+  }
+
+  table { width: 100%; border-collapse: collapse; font-size: 8.2px; }
+  th { text-align: left; background: #1d4ed8; color: #fff; font-weight: 700; padding: 3px 6px; }
+  td { padding: 3px 6px; border-bottom: 1px solid #e2e8f0; vertical-align: top; line-height: 1.3; background: #fff; }
+  tr:nth-child(even) td { background: #f8fafc; }
+  .sol { border: 1px solid #dbeafe; border-radius: 10px; overflow: hidden; background: #fff; }
+  .sol-h {
+    display: flex; align-items: center; gap: 2mm;
+    padding: 1.5mm 2.4mm;
+    background: #eff6ff;
+  }
+  .sol-h b { font-size: 9.5px; letter-spacing: 0.04em; color: #1e3a8a; }
+  .sol-h span.hint { margin-left: auto; font-size: 8px; color: #64748b; }
+
+  .check {
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 10px;
+    padding: 1.8mm 2.4mm 2mm;
+  }
+  .check h3 {
+    margin: 0 0 1.3mm;
+    font-size: 9px;
+    letter-spacing: 0.06em;
+    color: #065f46;
+    display: flex;
+    align-items: center;
+    gap: 6px;
+  }
+  .check-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.6mm; }
+  .check-row article {
+    display: flex; gap: 4px; align-items: flex-start;
+    font-size: 8px; line-height: 1.25; color: #064e3b;
+  }
+
+  .foot {
+    display: flex; justify-content: space-between;
+    font-size: 7.5px; color: #94a3b8; letter-spacing: 0.01em;
+  }
+
+  .phases { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2mm; min-height: 0; }
+  .phase { border-radius: 8px; padding: 2mm; min-height: 0; display: flex; flex-direction: column; gap: 1mm; }
+  .phase h3 { margin: 0; font-size: 11px; letter-spacing: 0.04em; }
+  .phase p { margin: 0; font-size: 8.6px; line-height: 1.3; }
+  .phase.a { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+  .phase.b { background: #fff7ed; border: 1px solid #fed7aa; color: #9a3412; }
+  .phase.c { background: #ecfdf5; border: 1px solid #a7f3d0; color: #065f46; }
+  .pill { align-self: flex-start; font-size: 7.5px; font-weight: 800; letter-spacing: 0.08em; background: #fff; border-radius: 999px; padding: 1px 6px; }
+
+  .time { display: flex; flex-direction: column; gap: 1.3mm; }
+  .bar-lab { display: flex; justify-content: space-between; font-size: 8px; color: #334155; font-weight: 650; }
+  .track { height: 8px; background: #e2e8f0; border-radius: 99px; overflow: hidden; display: flex; }
+  .track i { display: block; height: 100%; }
+  .note { font-size: 8px; color: #64748b; line-height: 1.3; }
+
+  .kv { display: grid; grid-template-columns: 42mm 1fr; gap: 1mm 2mm; font-size: 8.4px; }
+  .kv b { font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 7.8px; color: #1d4ed8; font-weight: 650; }
+  .kv span { color: #334155; }
+
+  .cover-hero { display: flex; flex-direction: column; gap: 1.2mm; }
+  .cover-k {
+    font-size: 10px; font-weight: 800; letter-spacing: 0.16em; color: #1d4ed8;
+  }
+  .cover-hero h1 { font-size: 34px; max-width: 150mm; }
+  .chapters { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2.4mm; flex: 0 0 auto; }
+  .cover-bottom { flex: 0 0 auto; min-height: 0; display: grid; grid-template-columns: 1.15fr 0.85fr; gap: 2.4mm; align-items: stretch; }
+  .fill { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; padding: 1.6mm 1.8mm; }
+  .phase > .fill { background: rgba(255,255,255,0.72); border-color: transparent; }
+  .sym { display: flex; flex-direction: column; }
+  .fill b { display: block; font-size: 7.6px; letter-spacing: 0.06em; color: #1d4ed8; margin-bottom: 0.6mm; }
+  .fill p, .fill li { font-size: 8.2px; line-height: 1.32; color: #334155; }
+  .fill ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 0.8mm; }
+  .apply { background: #fff; border: 1px solid #dbeafe; border-radius: 10px; padding: 2.2mm 2.6mm 2.4mm; }
+  .apply-grid { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2mm; margin-top: 1.5mm; }
+  .apply-grid article { background: #f8fbff; border: 1px solid #e0ecff; border-radius: 8px; padding: 2mm 2.2mm; min-height: 24mm; }
+  .apply-grid b { display: block; font-size: 9.5px; color: #0f2744; margin: 1mm 0 0.7mm; }
+  .apply-grid p { margin: 0; font-size: 8.5px; line-height: 1.35; color: #334155; }
+  .ch {
+    min-height: 0;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 10px;
+    padding: 2.6mm 2.8mm;
+    display: flex;
+    flex-direction: column;
+    gap: 1.3mm;
+    border-top: 3.5px solid #1d4ed8;
+  }
+  .apply-grid article { min-height: 0; }
+  .ch .idx { font-size: 10px; font-weight: 800; color: #1d4ed8; letter-spacing: 0.08em; }
+  .ch h3 { margin: 0; font-size: 12px; line-height: 1.15; color: #0f2744; }
+  .ch ul { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1mm; }
+  .ch li { font-size: 8.6px; line-height: 1.3; color: #334155; padding-left: 8px; position: relative; }
+  .ch li::before { content: ""; width: 4px; height: 4px; border-radius: 50%; background: #93c5fd; position: absolute; left: 0; top: 4px; }
+  .ch .visual { margin-top: auto; display: flex; flex-direction: column; gap: 1.3mm; }
+  .chips { display: flex; flex-wrap: wrap; gap: 1mm; }
+  .chip {
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 7.3px;
+    background: #eff6ff;
+    color: #1e3a8a;
+    border: 1px solid #dbeafe;
+    border-radius: 4px;
+    padding: 2px 5px;
+  }
+  .chip.g { background: #ecfdf5; color: #065f46; border-color: #a7f3d0; }
+  .chip.a { background: #fff7ed; color: #9a3412; border-color: #fed7aa; }
+  .chip.r { background: #fff1f2; color: #9f1239; border-color: #fecdd3; }
+  .action {
+    margin-top: auto;
+    background: #f8fafc;
+    border: 1px solid #e2e8f0;
+    border-radius: 7px;
+    padding: 1.5mm 1.8mm;
+    font-size: 8.2px;
+    line-height: 1.32;
+    color: #0f2744;
+  }
+  .action b { display: block; font-size: 7.6px; letter-spacing: 0.06em; color: #1d4ed8; margin-bottom: 0.4mm; }
+  .duo { margin-top: auto; display: grid; grid-template-columns: 1fr 1fr; gap: 1.4mm; }
+  .scale { display: flex; justify-content: space-between; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 7px; color: #94a3b8; margin-top: 0.4mm; }
+  .events { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.5mm; }
+  .ev { background: #f8fafc; border: 1px solid #e2e8f0; border-radius: 7px; padding: 1.4mm 1.6mm; }
+  .ev b { display: block; font-size: 8px; color: #0f2744; margin-bottom: 0.4mm; }
+  .ev span { font-size: 7.6px; line-height: 1.3; color: #475569; }
+  .meta {
+    display: grid;
+    grid-template-columns: 1.3fr 1fr 1fr;
+    gap: 2mm;
+  }
+  .meta article {
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    border-radius: 8px;
+    padding: 2mm 2.4mm;
+  }
+  .meta b { display: block; font-size: 8px; letter-spacing: 0.08em; color: #64748b; margin-bottom: 0.6mm; }
+  .meta span { font-size: 10px; font-weight: 700; color: #0f2744; }
+
+  .split { display: grid; grid-template-columns: 1.35fr 0.85fr; gap: 2.4mm; min-height: 0; }
+  .call {
+    border-radius: 8px;
+    padding: 1.8mm 2mm;
+    font-size: 8.6px;
+    line-height: 1.35;
+  }
+  .call strong { display: block; font-size: 9px; margin-bottom: 0.6mm; letter-spacing: 0.03em; }
+  .call.warn { background: #fff7ed; border: 1px solid #fdba74; color: #9a3412; }
+  .call.tip { background: #eff6ff; border: 1px solid #bfdbfe; color: #1e3a8a; }
+  .symptoms { display: grid; grid-template-columns: 1fr 1fr; gap: 2mm; min-height: 0; }
+  .sym {
+    border-radius: 8px;
+    padding: 1.8mm 2mm;
+    background: #fff;
+    border: 1px solid #e2e8f0;
+    min-height: 0;
+  }
+  .sym b { display: block; font-size: 9.5px; margin-bottom: 0.7mm; color: #0f2744; }
+  .sym p { margin: 0; font-size: 8.3px; line-height: 1.3; color: #334155; }
+  .sym .msg {
+    margin-top: 1mm;
+    font-family: "JetBrains Mono", ui-monospace, monospace;
+    font-size: 7.3px;
+    background: #0b1220;
+    color: #fecdd3;
+    border-radius: 4px;
+    padding: 2px 5px;
+  }
+</style>
+</head>
+<body>
+
+<section class="page">
+  <div class="cover-hero">
+    <div class="cover-k">MANUAL VISUAL</div>
+    <h1>Teste de login com Selenium WebDriver</h1>
+    <p class="sub">Diagramas, fluxo e checklist do exemplo em <b>test/login.test.js</b>. Cada página mostra o que o código faz hoje e a forma segura de publicar o mesmo teste.</p>
+  </div>
+
+  <div class="card" style="gap:1.4mm;">
+    <div class="sh">
+      <span class="num">1</span>
+      <div>
+        <b>O caminho que o exemplo percorre</b>
+        <em>Do Mocha até a saudação exibida depois do login</em>
+      </div>
+    </div>
+    <div class="flow">
+      <div class="step"><span class="n">1</span><strong>Mocha</strong><span>Chama o único caso de teste do arquivo.</span></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">2</span><strong>Chrome</strong><span>Builder abre uma sessão do navegador.</span></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">3</span><strong>Página</strong><span>driver.get carrega quick-notes.club.</span></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">4</span><strong>Formulário</strong><span>Preenche e-mail e senha e envia Enter.</span></div>
+      <div class="arrow">→</div>
+      <div class="step"><span class="n">5</span><strong>Prova</strong><span>Lê #user-name e compara o texto.</span></div>
+    </div>
+  </div>
+
+  <div class="chapters">
+    <article class="ch">
+      <div class="idx">CAPÍTULO 01</div>
+      <h3>Como o teste funciona</h3>
+      <ul>
+        <li>As peças importadas e o papel de cada uma.</li>
+        <li>Os ids da tela de login e da saudação.</li>
+        <li>O efeito de cada trecho no navegador.</li>
+      </ul>
+      <div class="visual">
+        <div class="chips"><span class="chip">Builder</span><span class="chip">By.id</span><span class="chip">Key.RETURN</span><span class="chip">until</span><span class="chip">assert</span></div>
+      </div>
+    </article>
+    <article class="ch" style="border-top-color:#0f766e">
+      <div class="idx" style="color:#0f766e">CAPÍTULO 02</div>
+      <h3>Arrange, Act e Assert</h3>
+      <ul>
+        <li>Preparar o Chrome e abrir a URL.</li>
+        <li>Agir como a pessoa que entra na conta.</li>
+        <li>Conferir a saudação e encerrar o driver.</li>
+      </ul>
+      <div class="visual">
+        <div class="chips"><span class="chip">Arrange</span><span class="chip a">Act</span><span class="chip g">Assert</span></div>
+      </div>
+    </article>
+    <article class="ch" style="border-top-color:#b45309">
+      <div class="idx" style="color:#b45309">CAPÍTULO 03</div>
+      <h3>Espere o elemento aparecer</h3>
+      <ul>
+        <li>findElement busca uma vez e pode falhar cedo.</li>
+        <li>elementLocated repete a busca dentro do prazo.</li>
+        <li>O wait devolve o elemento para o assert.</li>
+      </ul>
+      <div class="visual">
+        <div class="chips"><span class="chip r">findElement · 1 vez</span><span class="chip g">elementLocated · a cada 200 ms</span></div>
+      </div>
+    </article>
+    <article class="ch" style="border-top-color:#be123c">
+      <div class="idx" style="color:#be123c">CAPÍTULO 04</div>
+      <h3>Credenciais e execução</h3>
+      <ul>
+        <li>Senha lida do ambiente, fora do fonte.</li>
+        <li>O script npm test ainda não chama o Mocha.</li>
+        <li>Senha já commitada precisa ser trocada no site.</li>
+      </ul>
+      <div class="visual">
+        <div class="chips"><span class="chip">LOGIN_EMAIL</span><span class="chip">LOGIN_PASSWORD</span><span class="chip">LOGIN_GREETING</span></div>
+      </div>
+    </article>
+    <article class="ch" style="border-top-color:#6d28d9">
+      <div class="idx" style="color:#6d28d9">CAPÍTULO 05</div>
+      <h3>Quando o login falha</h3>
+      <ul>
+        <li>O Mocha corta o teste em 2 segundos.</li>
+        <li>Elemento ausente, texto diferente, Chrome preso.</li>
+        <li>Ordem para ler a falha e achar a causa.</li>
+      </ul>
+      <div class="visual">
+        <div class="time">
+          <div class="bar-lab"><span>Mocha padrão</span><span>2 s</span></div>
+          <div class="track"><i style="width:18%;background:#6d28d9"></i></div>
+          <div class="bar-lab"><span>describe com timeout</span><span>20 s</span></div>
+          <div class="track"><i style="width:100%;background:#1d4ed8"></i></div>
+        </div>
+      </div>
+    </article>
+    <article class="ch" style="border-top-color:#0369a1">
+      <div class="idx" style="color:#0369a1">CAPÍTULO 06</div>
+      <h3>Versão para publicar</h3>
+      <ul>
+        <li>Timeout de 20s, espera real e finally.</li>
+        <li>Variáveis LOGIN_EMAIL e LOGIN_PASSWORD.</li>
+        <li>Checklist antes de compartilhar o repositório.</li>
+      </ul>
+      <div class="visual">
+        <div class="chips"><span class="chip g">try { login }</span><span class="chip g">finally { quit() }</span></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="cover-bottom">
+    <article class="card">
+      <div class="sh">
+        <span class="num">2</span>
+        <div>
+          <b>A tela que o teste enxerga</b>
+          <em>Três ids. O assert só olha o terceiro.</em>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap: 2mm;">
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><div class="url">quick-notes.club · antes</div></div>
+          <div class="screen">
+            <div class="fieldlab">E-mail <code>#login-email</code></div>
+            <div class="field"></div>
+            <div class="fieldlab">Senha <code>#login-password</code></div>
+            <div class="field"></div>
+            <div class="fieldlab"><span>Enter</span><code>Key.RETURN</code></div>
+          </div>
+        </div>
+        <div class="browser">
+          <div class="chrome"><i></i><i></i><i></i><div class="url">quick-notes.club · depois</div></div>
+          <div class="screen">
+            <div class="hello">Hi, Hugo Moreira</div>
+            <div class="fieldlab"><span>Saudação visível</span><code>#user-name</code></div>
+            <p class="note">assert.equal compara esse texto com o valor esperado do teste.</p>
+          </div>
+        </div>
+      </div>
+    </article>
+    <article class="card">
+      <div class="sh">
+        <span class="num">3</span>
+        <div>
+          <b>Como ler cada capítulo</b>
+          <em>O mesmo desenho nas seis páginas</em>
+        </div>
+      </div>
+      <ul class="clean">
+        <li><span class="num">1</span><span>O título diz o problema do arquivo de teste.</span></li>
+        <li><span class="tick"></span><span>O quadro azul lista o que a página ensina.</span></li>
+        <li><span class="cross"></span><span>O cartão vermelho mostra o trecho como está hoje.</span></li>
+        <li><span class="tick"></span><span>O cartão verde mostra o trecho para publicar.</span></li>
+        <li><span class="num">5</span><span>A tabela liga sintoma, causa e ação.</span></li>
+        <li><span class="tick"></span><span>O checklist verde fecha a página com o que conferir.</span></li>
+      </ul>
+    </article>
+  </div>
+
+  <div class="meta">
+    <article><b>ARQUIVO</b><span>test/login.test.js</span></article>
+    <article><b>BIBLIOTECA</b><span>selenium-webdriver 4</span></article>
+    <article><b>EXECUTOR</b><span>Mocha 11 · ESM</span></article>
+  </div>
+  <div class="foot">
+    <span>Manual visual do repositório EXEMPLO-USO-WEBDRIVE</span>
+    <span>Capa</span>
+  </div>
+</section>
+
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">CAPÍTULO 1</div>
+      <h1>Como o teste<br>de login funciona</h1>
+      <p class="sub">Um caso só: abrir o Chrome, entrar em quick-notes.club e confirmar que a saudação da pessoa logada apareceu.</p>
+    </div>
+    <aside class="learn">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/><path d="M12 3v2M12 19v2M3 12h2M19 12h2"/></svg>
+        O QUE VOCÊ VAI APRENDER
+      </h2>
+      <ul>
+        <li><span class="tick"></span><span>Ligar Mocha, Chrome e a página em um fluxo só.</span></li>
+        <li><span class="tick"></span><span>Ler o papel de Builder, By, Key, until e assert.</span></li>
+        <li><span class="tick"></span><span>Reconhecer os três ids que o teste procura.</span></li>
+        <li><span class="tick"></span><span>Associar cada trecho a um efeito no navegador.</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="mid g2 rows-a">
+    <article class="card wide">
+      <div class="sh">
+        <span class="num">1</span>
+        <div>
+          <b>Fluxo do caso de teste</b>
+          <em>A ordem em que as chamadas acontecem dentro do it</em>
+        </div>
+      </div>
+      <div class="flow">
+        <div class="step"><span class="n">1</span><strong>build()</strong><span>Cria um ThenableWebDriver para o Chrome. Os comandos seguintes entram na fila da sessão.</span></div>
+        <div class="arrow">→</div>
+        <div class="step"><span class="n">2</span><strong>get(url)</strong><span>Navega até https://quick-notes.club/ e espera o carregamento da página.</span></div>
+        <div class="arrow">→</div>
+        <div class="step"><span class="n">3</span><strong>sendKeys</strong><span>Digita no #login-email e, no #login-password, digita a senha e Key.RETURN.</span></div>
+        <div class="arrow">→</div>
+        <div class="step"><span class="n">4</span><strong>wait + assert</strong><span>Espera #user-name ficar visível, lê o texto e compara com a saudação esperada.</span></div>
+        <div class="arrow">→</div>
+        <div class="step"><span class="n">5</span><strong>quit()</strong><span>Fecha o navegador. No arquivo atual isso só roda se o assert passar.</span></div>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="sh">
+        <span class="num">2</span>
+        <div>
+          <b>Peças importadas</b>
+          <em>Cada nome no topo do arquivo tem um trabalho</em>
+        </div>
+      </div>
+      <div class="kv">
+        <b>assert</b><span>Compara o texto lido com o texto esperado e falha o teste se forem diferentes.</span>
+        <b>Builder</b><span>Monta a sessão. forBrowser(Browser.CHROME) escolhe o Chrome instalado na máquina.</span>
+        <b>By.id</b><span>Vira o CSS *[id="..."]. É o localizador dos campos e da saudação.</span>
+        <b>Key.RETURN</b><span>É a tecla Enter. O exemplo usa Enter para enviar o formulário.</span>
+        <b>until</b><span>Guarda condições de espera: elementIsVisible e, na versão corrigida, elementLocated.</span>
+        <b>describe / it</b><span>São do Mocha. O arquivo descreve um módulo e um caso: login com credenciais válidas.</span>
+      </div>
+      <div class="fill">
+        <b>ORDEM NO ARQUIVO</b>
+        <ul>
+          <li>1. Imports de assert, Builder, By, Key e until.</li>
+          <li>2. describe nomeia o módulo de login.</li>
+          <li>3. it executa Arrange, Act e Assert.</li>
+          <li>4. quit() fecha o Chrome no caminho que passa.</li>
+        </ul>
+      </div>
+    </article>
+
+    <article class="card">
+      <div class="sh">
+        <span class="num">3</span>
+        <div>
+          <b>Ids que a página precisa ter</b>
+          <em>O teste quebra se um desses ids mudar</em>
+        </div>
+      </div>
+      <div class="browser">
+        <div class="chrome"><i></i><i></i><i></i><div class="url">https://quick-notes.club/</div></div>
+        <div class="screen">
+          <div class="fieldlab">E-mail <code>#login-email</code></div>
+          <div class="field"></div>
+          <div class="fieldlab">Senha <code>#login-password</code></div>
+          <div class="field"></div>
+          <div class="fieldlab"><span>Enter envia o formulário</span><code>Key.RETURN</code></div>
+        </div>
+      </div>
+      <div class="hello">Hi, Hugo Moreira <span style="font-weight:600;font-size:8px;color:#047857;">· texto de #user-name</span></div>
+      <div class="fill">
+        <b>SE O ID MUDAR</b>
+        <ul>
+          <li>#login-email some: a falha acontece antes de digitar.</li>
+          <li>#login-password some: o e-mail já foi digitado e o envio não ocorre.</li>
+          <li>#user-name some: o formulário foi enviado e a prova do login não aparece.</li>
+        </ul>
+      </div>
+    </article>
+  </div>
+
+  <div class="sol">
+    <div class="sol-h"><span class="num">4</span><b>O QUE CADA TRECHO PRODUZ</b><span class="hint">Leia o arquivo de cima para baixo</span></div>
+    <table>
+      <thead><tr><th style="width:34%">Trecho</th><th style="width:33%">Efeito</th><th>Se faltar</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">Builder + get</td><td>Abre o Chrome já na tela de login.</td><td>O teste para antes de achar qualquer campo.</td></tr>
+        <tr><td class="mono">sendKeys nos dois ids</td><td>Preenche o formulário e dispara o envio.</td><td>NoSuchElementError no campo ausente.</td></tr>
+        <tr><td class="mono">wait + getText + assert.equal</td><td>Confirma que a sessão mostrou a saudação certa.</td><td>Timeout ou falha de igualdade. O capítulo 3 detalha a espera.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check">
+    <h3><span class="tick"></span> CHECKLIST DE LEITURA</h3>
+    <div class="check-row">
+      <article><span class="tick"></span><span>Sei apontar quem abre o Chrome e quem fecha.</span></article>
+      <article><span class="tick"></span><span>Sei os três ids: e-mail, senha e saudação.</span></article>
+      <article><span class="tick"></span><span>Sei que Enter está no sendKeys da senha.</span></article>
+      <article><span class="tick"></span><span>Sei qual texto o assert compara.</span></article>
+    </div>
+  </div>
+  <div class="apply">
+    <div class="sh"><span class="num">5</span><div><b>Aplique neste arquivo</b><em>Três marcações antes de mudar qualquer linha</em></div></div>
+    <div class="apply-grid">
+      <article><span class="num">1</span><b>Abra o teste</b><p>O caso está em test/login.test.js. Há um describe e um único it.</p></article>
+      <article><span class="num">2</span><b>Marque o fluxo</b><p>Circule build, os dois sendKeys e o assert.equal. Essa é a história do login.</p></article>
+      <article><span class="num">3</span><b>Confira os ids</b><p>Na página, confirme #login-email, #login-password e #user-name.</p></article>
+    </div>
+  </div>
+  <div class="foot"><span>Manual visual · Selenium WebDriver</span><span>Capítulo 1 · test/login.test.js</span></div>
+</section>
+
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">CAPÍTULO 2</div>
+      <h1>Arrange, Act<br>e Assert</h1>
+      <p class="sub">O exemplo já separa o teste em três comentários. Cada fase tem um motivo para existir e um tipo de falha próprio.</p>
+    </div>
+    <aside class="learn">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><circle cx="12" cy="12" r="9"/><circle cx="12" cy="12" r="4"/></svg>
+        O QUE VOCÊ VAI APRENDER
+      </h2>
+      <ul>
+        <li><span class="tick"></span><span>O que entra em Arrange, Act e Assert neste login.</span></li>
+        <li><span class="tick"></span><span>Por que o assert olha a tela, e não o código do site.</span></li>
+        <li><span class="tick"></span><span>Qual fase explica cada tipo de falha.</span></li>
+        <li><span class="tick"></span><span>Onde o quit() precisa viver para sempre rodar.</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="mid" style="grid-template-rows: auto auto;">
+    <div class="phases">
+      <article class="phase a">
+        <span class="pill">ARRANGE</span>
+        <h3>Prepara</h3>
+        <p>Cria o driver do Chrome e abre a URL. No fim desta fase a tela de login está no navegador e nenhum campo foi preenchido.</p>
+        <p>build() devolve um ThenableWebDriver: dá para chamar get() sem await no build. Await no build deixa explícito o momento em que a sessão falhou ao abrir.</p>
+        <div class="fill"><b>PRODUZ</b><p>Chrome aberto em quick-notes.club, com o formulário ainda vazio.</p></div>
+      </article>
+      <article class="phase b">
+        <span class="pill">ACT</span>
+        <h3>Age</h3>
+        <p>Localiza #login-email e #login-password, digita e manda Enter. É o gesto da pessoa usuária. O teste ainda não decide se o login deu certo.</p>
+        <p>sendKeys aceita texto e teclas na mesma chamada. A senha e Key.RETURN vão juntos no segundo campo.</p>
+        <div class="fill"><b>PRODUZ</b><p>O formulário foi enviado. O teste ainda não sabe se a conta entrou.</p></div>
+      </article>
+      <article class="phase c">
+        <span class="pill">ASSERT</span>
+        <h3>Confere</h3>
+        <p>Espera a saudação, lê #user-name e compara com o texto esperado. assert.equal falha com a diferença exata entre o recebido e o esperado.</p>
+        <p>quit() fecha o Chrome. No arquivo atual ele está depois do assert, então uma falha pula o fechamento.</p>
+        <div class="fill"><b>PRODUZ</b><p>Teste verde quando o texto de #user-name é o esperado. Teste vermelho com os dois textos na mensagem.</p></div>
+      </article>
+    </div>
+
+    <article class="card">
+      <div class="sh">
+        <span class="num">4</span>
+        <div>
+          <b>O mesmo teste, com as fases visíveis</b>
+          <em>Valores sensíveis ficam em variáveis. A estrutura é a do arquivo.</em>
+        </div>
+      </div>
+      <div class="snippet">
+        <div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>test/login.test.js<span class="tag ok">fases</span></div>
+        <pre><span class="cm">// Arrange — navegador na tela de login</span>
+<span class="kw">const</span> driver = <span class="kw">await new</span> <span class="fn">Builder</span>().<span class="fn">forBrowser</span>(Browser.CHROME).<span class="fn">build</span>();
+<span class="kw">await</span> driver.<span class="fn">get</span>(url);
+
+<span class="cm">// Act — a pessoa preenche e envia</span>
+<span class="kw">await</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'login-email'</span>)).<span class="fn">sendKeys</span>(email);
+<span class="kw">await</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'login-password'</span>)).<span class="fn">sendKeys</span>(senha, Key.RETURN);
+
+<span class="cm">// Assert — a sessão mostra a saudação esperada</span>
+<span class="kw">const</span> nome = <span class="kw">await</span> driver.<span class="fn">wait</span>(until.<span class="fn">elementLocated</span>(By.<span class="fn">id</span>(<span class="st">'user-name'</span>)), <span class="st">8000</span>);
+<span class="kw">await</span> driver.<span class="fn">wait</span>(until.<span class="fn">elementIsVisible</span>(nome), <span class="st">8000</span>);
+assert.<span class="fn">equal</span>(<span class="kw">await</span> nome.<span class="fn">getText</span>(), saudacaoEsperada);</pre>
+      </div>
+      <div class="events">
+        <div class="ev"><b>Arrange</b><span>Abre a sessão e a URL. Para aqui se o Chrome não subir.</span></div>
+        <div class="ev"><b>Act</b><span>Digita nos dois ids e envia Enter. Para aqui se um campo sumiu.</span></div>
+        <div class="ev"><b>Assert</b><span>Lê a saudação. Para aqui se o texto não for o esperado.</span></div>
+        <div class="ev"><b>quit()</b><span>No arquivo atual só roda depois do assert. O capítulo 6 muda isso.</span></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="sol">
+    <div class="sol-h"><span class="num">5</span><b>QUAL FASE EXPLICA A FALHA</b><span class="hint">Comece pela mensagem e volte uma fase</span></div>
+    <table>
+      <thead><tr><th style="width:28%">Mensagem</th><th style="width:22%">Fase</th><th>O que verificar</th></tr></thead>
+      <tbody>
+        <tr><td>Session not created, Chrome ausente</td><td>Arrange</td><td>Chrome instalado e selenium-webdriver 4 resolvendo o driver.</td></tr>
+        <tr><td>NoSuchElementError em login-email ou login-password</td><td>Act</td><td>A URL abriu a tela certa e os ids continuam iguais.</td></tr>
+        <tr><td>Timeout ou textos diferentes no assert</td><td>Assert</td><td>O login concluiu e o texto de #user-name é o combinado.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check">
+    <h3><span class="tick"></span> CHECKLIST DAS TRÊS FASES</h3>
+    <div class="check-row">
+      <article><span class="tick"></span><span>Arrange só prepara. Não digita senha.</span></article>
+      <article><span class="tick"></span><span>Act só executa o gesto do usuário.</span></article>
+      <article><span class="tick"></span><span>Assert compara um resultado visível.</span></article>
+      <article><span class="tick"></span><span>quit() fica numa fase que sempre roda.</span></article>
+    </div>
+  </div>
+  <div class="apply">
+    <div class="sh"><span class="num">6</span><div><b>Aplique nas três fases</b><em>O comentário já existe. A responsabilidade de cada fase precisa continuar separada.</em></div></div>
+    <div class="apply-grid">
+      <article><span class="num">1</span><b>Arrange</b><p>Só Chrome e URL. Nenhum sendKeys neste bloco.</p></article>
+      <article><span class="num">2</span><b>Act</b><p>Só o preenchimento e o Enter. O teste ainda não decide o resultado.</p></article>
+      <article><span class="num">3</span><b>Assert</b><p>Só a leitura de #user-name e o assert.equal. Anote qual fase a falha cita.</p></article>
+    </div>
+  </div>
+  <div class="foot"><span>Manual visual · Selenium WebDriver</span><span>Capítulo 2 · test/login.test.js</span></div>
+</section>
+
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">CAPÍTULO 3</div>
+      <h1>Espere o elemento<br>aparecer</h1>
+      <p class="sub">A espera do arquivo pede 5 segundos, mas a busca do #user-name acontece uma vez, fora do ciclo. Se o login ainda não renderizou, o prazo não chega a ser usado.</p>
+    </div>
+    <aside class="learn">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 7v6l4 2"/></svg>
+        O QUE VOCÊ VAI APRENDER
+      </h2>
+      <ul>
+        <li><span class="tick"></span><span>A diferença entre achar agora e esperar aparecer.</span></li>
+        <li><span class="tick"></span><span>Por que elementIsVisible sozinho não repete a busca.</span></li>
+        <li><span class="tick"></span><span>Como elementLocated consulta de novo a cada 200 ms.</span></li>
+        <li><span class="tick"></span><span>Usar o elemento que o wait devolve.</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="mid g2 rows-b">
+    <article class="card bad">
+      <div class="sh">
+        <span class="num red">1</span>
+        <div>
+          <b>Busca única, espera depois</b>
+          <em>É o que test/login.test.js faz hoje</em>
+        </div>
+      </div>
+      <div class="snippet">
+        <div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>espera atual<span class="tag err">falha cedo</span></div>
+        <pre><span class="kw">await</span> driver.<span class="fn">wait</span>(
+  until.<span class="fn">elementIsVisible</span>(
+    driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'user-name'</span>))
+  ),
+  <span class="st">5000</span>
+);
+<span class="kw">const</span> saudacao = <span class="kw">await</span> driver
+  .<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'user-name'</span>))
+  .<span class="fn">getText</span>();</pre>
+      </div>
+      <p class="body">findElement já dispara quando a condição é criada. Se #user-name ainda não está no DOM, a promise rejeita. driver.wait, ao receber essa rejeição, encerra na hora. Os 5000 ms só valem quando o elemento existe e isDisplayed() responde false.</p>
+    </article>
+
+    <article class="card good">
+      <div class="sh">
+        <span class="num green">2</span>
+        <div>
+          <b>Busca repetida dentro do prazo</b>
+          <em>elementLocated usa findElements e tenta de novo</em>
+        </div>
+      </div>
+      <div class="snippet">
+        <div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>espera corrigida<span class="tag ok">dentro do prazo</span></div>
+        <pre><span class="kw">const</span> nome = <span class="kw">await</span> driver.<span class="fn">wait</span>(
+  until.<span class="fn">elementLocated</span>(By.<span class="fn">id</span>(<span class="st">'user-name'</span>)),
+  <span class="st">8000</span>
+);
+<span class="kw">await</span> driver.<span class="fn">wait</span>(
+  until.<span class="fn">elementIsVisible</span>(nome),
+  <span class="st">8000</span>
+);
+<span class="kw">const</span> saudacao = <span class="kw">await</span> nome.<span class="fn">getText</span>();</pre>
+      </div>
+      <p class="body">elementLocated chama findElements. Lista vazia é resultado falso, então o wait tenta outra vez a cada 200 ms. Quando o id entra na página, a condição devolve o WebElement. A segunda espera confirma que ele está visível. getText usa esse mesmo objeto.</p>
+    </article>
+
+    <article class="card wide">
+      <div class="sh">
+        <span class="num">3</span>
+        <div>
+          <b>Linha do tempo: o login renderiza aos 800 ms</b>
+          <em>A busca única já falhou. A busca repetida ainda está no prazo.</em>
+        </div>
+      </div>
+      <div class="time">
+        <div>
+          <div class="bar-lab"><span>findElement fora do ciclo</span><span>rejeita em ~0 ms</span></div>
+          <div class="track"><i style="width:8%;background:#e11d48"></i></div>
+        </div>
+        <div>
+          <div class="bar-lab"><span>#user-name entra no DOM</span><span>800 ms</span></div>
+          <div class="track"><i style="width:28%;background:#d97706"></i></div>
+        </div>
+        <div>
+          <div class="bar-lab"><span>elementLocated ainda consultando</span><span>sucesso perto de 800 ms</span></div>
+          <div class="track"><i style="width:28%;background:#059669"></i><i style="width:52%;background:#bbf7d0"></i></div>
+        </div>
+        <div class="scale"><span>0</span><span>200 ms</span><span>800 ms</span><span>2 s</span><span>5 s</span><span>8 s</span></div>
+        <p class="note">A faixa verde-clara é o resto da janela de 8 segundos, que fica sem uso quando o elemento aparece cedo. A faixa vermelha é a busca que não volta a tentar.</p>
+      </div>
+      <div class="events">
+        <div class="ev"><b>0 ms</b><span>findElement dispara uma vez. Se o id não existe, a promise rejeita.</span></div>
+        <div class="ev"><b>200 ms</b><span>elementLocated consulta de novo. Lista vazia faz o wait continuar.</span></div>
+        <div class="ev"><b>800 ms</b><span>O id entrou na página. A condição devolve o WebElement.</span></div>
+        <div class="ev"><b>Depois</b><span>elementIsVisible confirma a tela. getText usa esse elemento.</span></div>
+      </div>
+    </article>
+  </div>
+
+  <div class="sol">
+    <div class="sol-h"><span class="num">4</span><b>QUAL ESPERA USAR</b><span class="hint">As duas condições respondem perguntas diferentes</span></div>
+    <table>
+      <thead><tr><th style="width:28%">Pergunta</th><th style="width:34%">Condição</th><th>Resultado enquanto espera</th></tr></thead>
+      <tbody>
+        <tr><td>O id já está no DOM?</td><td class="mono">until.elementLocated(By.id(...))</td><td>Repete a busca. Devolve o elemento quando achar.</td></tr>
+        <tr><td>Esse elemento está visível?</td><td class="mono">until.elementIsVisible(elemento)</td><td>Chama isDisplayed() no elemento que você já tem.</td></tr>
+        <tr><td>As duas coisas, em ordem</td><td class="mono">located, depois visible</td><td>Cobre redirect lento e elemento presente porém oculto.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check">
+    <h3><span class="tick"></span> CHECKLIST DA ESPERA</h3>
+    <div class="check-row">
+      <article><span class="tick"></span><span>A localização está dentro do wait.</span></article>
+      <article><span class="tick"></span><span>A visibilidade usa o elemento achado.</span></article>
+      <article><span class="tick"></span><span>O assert lê esse elemento, sem buscar de novo.</span></article>
+      <article><span class="tick"></span><span>O prazo é maior que o login real da página.</span></article>
+    </div>
+  </div>
+  <div class="apply">
+    <div class="sh"><span class="num">5</span><div><b>Troque a espera do arquivo</b><em>A busca da saudação passa a viver dentro do prazo</em></div></div>
+    <div class="apply-grid">
+      <article><span class="num">1</span><b>Localize</b><p>until.elementLocated(By.id('user-name')) no primeiro wait.</p></article>
+      <article><span class="num">2</span><b>Mostre</b><p>until.elementIsVisible no elemento que o primeiro wait devolveu.</p></article>
+      <article><span class="num">3</span><b>Leia</b><p>getText nesse mesmo elemento. O prazo de 8000 ms cobre o render do login.</p></article>
+    </div>
+  </div>
+  <div class="foot"><span>Manual visual · Selenium WebDriver</span><span>Capítulo 3 · test/login.test.js</span></div>
+</section>
+
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">CAPÍTULO 4</div>
+      <h1>Credenciais e<br>como executar</h1>
+      <p class="sub">O teste atual escreve e-mail e senha dentro de sendKeys. Quem clona o repositório lê a senha. O script npm test também ainda não executa o Mocha.</p>
+    </div>
+    <aside class="learn">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><rect x="5" y="11" width="14" height="10" rx="2"/><path d="M8 11V8a4 4 0 0 1 8 0v3"/></svg>
+        O QUE VOCÊ VAI APRENDER
+      </h2>
+      <ul>
+        <li><span class="tick"></span><span>Tirar e-mail e senha do arquivo de teste.</span></li>
+        <li><span class="tick"></span><span>Falhar com uma mensagem clara se o ambiente estiver vazio.</span></li>
+        <li><span class="tick"></span><span>Fazer npm test rodar o Mocha neste arquivo.</span></li>
+        <li><span class="tick"></span><span>Trocar a senha que já entrou no histórico do Git.</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="mid g2 rows-c">
+    <article class="card bad">
+      <div class="sh">
+        <span class="num red">1</span>
+        <div>
+          <b>Segredo dentro do fonte</b>
+          <em>O arquivo de hoje segue este formato</em>
+        </div>
+      </div>
+      <div class="snippet">
+        <div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>sendKeys<span class="tag err">no repositório</span></div>
+        <pre>driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'login-email'</span>))
+  .<span class="fn">sendKeys</span>(<span class="badl">'usuario@email.com'</span>);
+driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'login-password'</span>))
+  .<span class="fn">sendKeys</span>(<span class="badl">'senha-em-texto-puro'</span>, Key.RETURN);</pre>
+      </div>
+      <p class="body">Os valores reais estão no teste commitado. Este quadro mostra só o formato. Apagar a linha numa correção futura tira o segredo dos commits novos. Os commits antigos continuam com a senha. Troque a senha dessa conta no site.</p>
+    </article>
+    <article class="card good">
+      <div class="sh">
+        <span class="num green">2</span>
+        <div>
+          <b>Segredo no ambiente</b>
+          <em>O processo lê, o Git não guarda</em>
+        </div>
+      </div>
+      <div class="snippet">
+        <div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>ambiente<span class="tag ok">fora do Git</span></div>
+        <pre><span class="kw">const</span> EMAIL = process.env.LOGIN_EMAIL;
+<span class="kw">const</span> SENHA = process.env.LOGIN_PASSWORD;
+<span class="kw">if</span> (!EMAIL || !SENHA) {
+  <span class="kw">throw new</span> <span class="fn">Error</span>(
+    <span class="st">'Defina LOGIN_EMAIL e LOGIN_PASSWORD.'</span>
+  );
+}</pre>
+      </div>
+      <p class="body">Sem as variáveis, o teste para com uma frase que diz o que falta. A saudação esperada pode ir em LOGIN_GREETING, porque também é dado do ambiente e não do código.</p>
+    </article>
+
+    <article class="card">
+      <div class="sh">
+        <span class="num">3</span>
+        <div>
+          <b>Variáveis deste exemplo</b>
+          <em>Exporte no terminal antes do npm test</em>
+        </div>
+      </div>
+      <div class="kv">
+        <b>APP_URL</b><span>Endereço aberto no Arrange. Padrão útil: https://quick-notes.club/</span>
+        <b>LOGIN_EMAIL</b><span>Valor digitado em #login-email. Obrigatório.</span>
+        <b>LOGIN_PASSWORD</b><span>Valor digitado em #login-password. Obrigatório.</span>
+        <b>LOGIN_GREETING</b><span>Texto esperado de #user-name. No exemplo atual: Hi, Hugo Moreira.</span>
+      </div>
+      <div class="fill">
+        <b>NO TERMINAL</b>
+        <p class="mono" style="font-size:7.4px;line-height:1.45;margin:0;">export LOGIN_EMAIL=...<br>export LOGIN_PASSWORD=...<br>export LOGIN_GREETING='Hi, Hugo Moreira'<br>npm test</p>
+      </div>
+    </article>
+    <article class="card">
+      <div class="sh">
+        <span class="num">4</span>
+        <div>
+          <b>npm test ainda não roda o caso</b>
+          <em>O Mocha está nas dependências, o script aponta para outro comando</em>
+        </div>
+      </div>
+      <div class="snippet">
+        <div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>package.json<span class="tag ok">script</span></div>
+        <pre><span class="cm">"test": "mocha test/login.test.js --timeout 20000"</span></pre>
+      </div>
+      <p class="body">O package.json deste repositório declara mocha e "type": "module", então o teste em ESM é compatível com o Mocha 11. O script test precisa chamar esse arquivo. Sem isso, npm test termina sem abrir o Chrome.</p>
+      <div class="fill">
+        <b>O QUE O SCRIPT ATUAL FAZ</b>
+        <ul>
+          <li>Imprime uma mensagem de erro e sai com código 1.</li>
+          <li>Não chama o Mocha e não abre o Chrome.</li>
+          <li>A troca é apontar "test" para test/login.test.js.</li>
+        </ul>
+      </div>
+    </article>
+  </div>
+
+  <div class="sol">
+    <div class="sol-h"><span class="num">5</span><b>TABELA DE SOLUÇÕES RÁPIDAS</b><span class="hint">Segredo e comando de execução</span></div>
+    <table>
+      <thead><tr><th style="width:28%">Situação</th><th style="width:34%">Causa</th><th>Ação</th></tr></thead>
+      <tbody>
+        <tr><td>A senha aparece no Git</td><td>sendKeys recebeu um texto literal e isso foi commitado.</td><td>Passe a ler o ambiente e troque a senha da conta no site.</td></tr>
+        <tr><td>npm test não abre o Chrome</td><td>O script test não chama o Mocha.</td><td>Aponte o script para test/login.test.js.</td></tr>
+        <tr><td>Erro pedindo LOGIN_EMAIL</td><td>O terminal subiu sem as variáveis.</td><td>Exporte e-mail, senha e saudação e rode de novo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check">
+    <h3><span class="tick"></span> CHECKLIST ANTES DE COMPARTILHAR</h3>
+    <div class="check-row">
+      <article><span class="tick"></span><span>Nenhum sendKeys leva senha literal.</span></article>
+      <article><span class="tick"></span><span>A senha antiga da conta foi trocada.</span></article>
+      <article><span class="tick"></span><span>npm test chama o Mocha neste arquivo.</span></article>
+      <article><span class="tick"></span><span>O comando exporta as três variáveis.</span></article>
+    </div>
+  </div>
+  <div class="apply">
+    <div class="sh"><span class="num">6</span><div><b>Tire o segredo e ligue o comando</b><em>O Git fica com o fluxo. O terminal fica com a senha.</em></div></div>
+    <div class="apply-grid">
+      <article><span class="num">1</span><b>Apague o literal</b><p>sendKeys passa a receber LOGIN_EMAIL e LOGIN_PASSWORD.</p></article>
+      <article><span class="num">2</span><b>Troque a senha</b><p>A senha que já foi commitada continua no histórico. Troque-a no site.</p></article>
+      <article><span class="num">3</span><b>Aponte o npm test</b><p>O script test chama mocha test/login.test.js --timeout 20000.</p></article>
+    </div>
+  </div>
+  <div class="foot"><span>Manual visual · Selenium WebDriver</span><span>Capítulo 4 · test/login.test.js</span></div>
+</section>
+
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">CAPÍTULO 5</div>
+      <h1>Quando o teste<br>de login falha</h1>
+      <p class="sub">Quatro falhas cobrem quase todo erro deste arquivo: o Mocha desiste em 2 segundos, o elemento não está lá, o texto mudou, ou o Chrome fica aberto depois do erro.</p>
+    </div>
+    <aside class="learn">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><circle cx="12" cy="12" r="9"/><path d="M12 8v5M12 16h.01"/></svg>
+        O QUE VOCÊ VAI APRENDER
+      </h2>
+      <ul>
+        <li><span class="tick"></span><span>Separar o prazo do Mocha do prazo do Selenium.</span></li>
+        <li><span class="tick"></span><span>Ler NoSuchElementError e TimeoutError.</span></li>
+        <li><span class="tick"></span><span>Usar a diferença do assert para achar texto trocado.</span></li>
+        <li><span class="tick"></span><span>Fechar o navegador também no caminho de erro.</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="mid" style="grid-template-rows: auto auto;">
+    <div class="symptoms">
+      <article class="sym">
+        <b>1. O Mocha corta aos 2 segundos</b>
+        <p>O prazo padrão do Mocha é 2000 ms. Abrir o Chrome e esperar a saudação passa disso. O it deste arquivo é uma arrow function, então this.timeout() dentro dele não altera o caso. O prazo vale no describe, que já é uma function comum.</p>
+        <div class="msg">Timeout of 2000ms exceeded</div>
+        <div class="fill"><b>AÇÃO</b><p style="margin:0;">this.timeout(20000) no describe. O it pode continuar como function, para o this do Mocha existir.</p></div>
+      </article>
+      <article class="sym">
+        <b>2. O campo ou a saudação não existe</b>
+        <p>findElement rejeita assim que a busca única falha. By.id vira CSS. Confira se a URL é a tela de login e se o id continua no HTML.</p>
+        <div class="msg">no such element: *[id="user-name"]</div>
+        <div class="fill"><b>AÇÃO</b><p style="margin:0;">Troque a busca da saudação por elementLocated. Confira os ids do formulário no HTML da página.</p></div>
+      </article>
+      <article class="sym">
+        <b>3. A saudação veio diferente</b>
+        <p>O elemento apareceu, o texto não é o esperado. assert.equal mostra os dois lados. Atualize LOGIN_GREETING ou corrija a conta usada no teste.</p>
+        <div class="msg">Expected values to be strictly equal</div>
+        <div class="fill"><b>AÇÃO</b><p style="margin:0;">Leia o texto que a página mostrou e alinhe LOGIN_GREETING a ele.</p></div>
+      </article>
+      <article class="sym">
+        <b>4. O Chrome continua aberto</b>
+        <p>quit() está depois do assert. Qualquer throw anterior pula essa linha e deixa o processo do navegador vivo. O finally do capítulo 6 roda nos dois caminhos.</p>
+        <div class="msg">processo chrome ainda listado</div>
+        <div class="fill"><b>AÇÃO</b><p style="margin:0;">Feche o Chrome que sobrou e rode de novo com quit() dentro de finally.</p></div>
+      </article>
+    </div>
+
+    <article class="card">
+      <div class="sh">
+        <span class="num">5</span>
+        <div>
+          <b>Dois relógios ao mesmo tempo</b>
+          <em>O Selenium pode pedir 5 segundos. O Mocha encerra o teste aos 2.</em>
+        </div>
+      </div>
+      <div class="time">
+        <div>
+          <div class="bar-lab"><span>Mocha, prazo padrão</span><span>2000 ms e o teste é encerrado</span></div>
+          <div class="track"><i style="width:22%;background:#6d28d9"></i></div>
+        </div>
+        <div>
+          <div class="bar-lab"><span>Abertura do Chrome + navegação</span><span>muitas vezes já passa de 2 s</span></div>
+          <div class="track"><i style="width:30%;background:#d97706"></i></div>
+        </div>
+        <div>
+          <div class="bar-lab"><span>wait do exemplo atual</span><span>pede mais 5000 ms depois da ação</span></div>
+          <div class="track"><i style="width:18%;background:#e2e8f0"></i><i style="width:55%;background:#1d4ed8"></i></div>
+        </div>
+        <p class="note">A barra azul só teria chance de terminar se o Mocha esperasse o conjunto inteiro. this.timeout(20000) no describe cobre sessão, página e as duas esperas.</p>
+      </div>
+    </article>
+  </div>
+
+  <div class="sol">
+    <div class="sol-h"><span class="num">6</span><b>ORDEM PARA DIAGNOSTICAR</b><span class="hint">Pare na primeira linha que explica o sintoma</span></div>
+    <table>
+      <thead><tr><th style="width:8%">Passo</th><th style="width:32%">Olhe</th><th>Conclusão prática</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td>A primeira linha vermelha do Mocha</td><td>2000 ms aponta para o prazo do runner, antes de culpar o login.</td></tr>
+        <tr><td>2</td><td>O id citado no NoSuchElementError</td><td>O id diz se a falha foi o formulário ou a saudação.</td></tr>
+        <tr><td>3</td><td>Os dois textos do assert</td><td>A página logou. O texto esperado é que precisa ser alinhado.</td></tr>
+        <tr><td>4</td><td>Se o Chrome ficou aberto</td><td>Faltou finally. Feche o processo e rode o teste outra vez limpo.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check">
+    <h3><span class="tick"></span> CHECKLIST DE UMA FALHA</h3>
+    <div class="check-row">
+      <article><span class="tick"></span><span>O prazo do Mocha é maior que o do wait.</span></article>
+      <article><span class="tick"></span><span>A mensagem cita o id que faltou.</span></article>
+      <article><span class="tick"></span><span>O assert mostra os dois textos.</span></article>
+      <article><span class="tick"></span><span>O Chrome fecha mesmo com erro.</span></article>
+    </div>
+  </div>
+  <div class="apply">
+    <div class="sh"><span class="num">7</span><div><b>Leia a primeira linha e pare</b><em>Uma mensagem basta para escolher o conserto</em></div></div>
+    <div class="apply-grid">
+      <article><span class="num">1</span><b>2000 ms</b><p>É o Mocha. Coloque this.timeout(20000) no describe.</p></article>
+      <article><span class="num">2</span><b>Um id na mensagem</b><p>A busca não achou o campo ou a saudação. Vá para o capítulo 3.</p></article>
+      <article><span class="num">3</span><b>Dois textos no assert</b><p>O login aconteceu. Alinhe LOGIN_GREETING ao texto da tela.</p></article>
+    </div>
+  </div>
+  <div class="foot"><span>Manual visual · Selenium WebDriver</span><span>Capítulo 5 · test/login.test.js</span></div>
+</section>
+
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">CAPÍTULO 6</div>
+      <h1>A versão pronta<br>para publicar</h1>
+      <p class="sub">O mesmo login, com sessão aguardada, espera que repete a busca, segredos no ambiente e navegador fechado nos dois caminhos.</p>
+    </div>
+    <aside class="learn">
+      <h2>
+        <svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="#1d4ed8" stroke-width="2"><path d="M20 6L9 17l-5-5"/></svg>
+        O QUE VOCÊ VAI APRENDER
+      </h2>
+      <ul>
+        <li><span class="tick"></span><span>Juntar as correções num único caso de teste.</span></li>
+        <li><span class="tick"></span><span>Onde cada mudança entra no arquivo.</span></li>
+        <li><span class="tick"></span><span>O comando que executa com as variáveis.</span></li>
+        <li><span class="tick"></span><span>O checklist final antes do push.</span></li>
+      </ul>
+    </aside>
+  </div>
+
+  <div class="mid">
+    <div class="split">
+      <div style="display:flex; flex-direction:column; gap:2mm; min-height:0;">
+      <div class="snippet">
+        <div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>test/login.test.js<span class="tag ok">publicável</span></div>
+        <pre><span class="kw">import</span> assert <span class="kw">from</span> <span class="st">'node:assert/strict'</span>;
+<span class="kw">import</span> { Builder, Browser, By, Key, until } <span class="kw">from</span> <span class="st">'selenium-webdriver'</span>;
+
+<span class="kw">const</span> URL = process.env.APP_URL ?? <span class="st">'https://quick-notes.club/'</span>;
+<span class="kw">const</span> EMAIL = process.env.LOGIN_EMAIL;
+<span class="kw">const</span> SENHA = process.env.LOGIN_PASSWORD;
+<span class="kw">const</span> SAUDACAO = process.env.LOGIN_GREETING;
+
+<span class="fn">describe</span>(<span class="st">'Testes do Módulo de Login'</span>, <span class="kw">function</span> () {
+  <span class="kw">this</span>.<span class="fn">timeout</span>(<span class="st">20000</span>);
+
+  <span class="fn">it</span>(<span class="st">'permite o login com credenciais válidas'</span>, <span class="kw">async function</span> () {
+    <span class="kw">if</span> (!EMAIL || !SENHA || !SAUDACAO) {
+      <span class="kw">throw new</span> <span class="fn">Error</span>(<span class="st">'Defina LOGIN_EMAIL, LOGIN_PASSWORD e LOGIN_GREETING.'</span>);
+    }
+    <span class="kw">const</span> driver = <span class="kw">await new</span> <span class="fn">Builder</span>().<span class="fn">forBrowser</span>(Browser.CHROME).<span class="fn">build</span>();
+    <span class="kw">try</span> {
+      <span class="kw">await</span> driver.<span class="fn">get</span>(URL);
+      <span class="kw">await</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'login-email'</span>)).<span class="fn">sendKeys</span>(EMAIL);
+      <span class="kw">await</span> driver.<span class="fn">findElement</span>(By.<span class="fn">id</span>(<span class="st">'login-password'</span>)).<span class="fn">sendKeys</span>(SENHA, Key.RETURN);
+      <span class="kw">const</span> nome = <span class="kw">await</span> driver.<span class="fn">wait</span>(until.<span class="fn">elementLocated</span>(By.<span class="fn">id</span>(<span class="st">'user-name'</span>)), <span class="st">8000</span>);
+      <span class="kw">await</span> driver.<span class="fn">wait</span>(until.<span class="fn">elementIsVisible</span>(nome), <span class="st">8000</span>);
+      assert.<span class="fn">equal</span>(<span class="kw">await</span> nome.<span class="fn">getText</span>(), SAUDACAO);
+    } <span class="kw">finally</span> {
+      <span class="kw">await</span> driver.<span class="fn">quit</span>();
+    }
+  });
+});</pre>
+      </div>
+      <div class="events">
+        <div class="ev"><b>Ambiente</b><span>E-mail, senha e saudação ficam fora do arquivo.</span></div>
+        <div class="ev"><b>20 s</b><span>O describe espera a sessão, a página e as duas buscas.</span></div>
+        <div class="ev"><b>Espera</b><span>Localiza #user-name e só então testa se está visível.</span></div>
+        <div class="ev"><b>finally</b><span>quit() roda com o teste verde ou vermelho.</span></div>
+      </div>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:2mm;min-height:0;">
+        <article class="card">
+          <div class="sh">
+            <span class="num">1</span>
+            <div>
+              <b>O que mudou</b>
+              <em>Seis trocas em relação ao arquivo atual</em>
+            </div>
+          </div>
+          <ul class="clean">
+            <li><span class="tick"></span><span>E-mail, senha e saudação vêm do ambiente.</span></li>
+            <li><span class="tick"></span><span>O describe espera 20 segundos.</span></li>
+            <li><span class="tick"></span><span>build() é aguardado. A falha de sessão aparece ali.</span></li>
+            <li><span class="tick"></span><span>elementLocated repete a busca de #user-name.</span></li>
+            <li><span class="tick"></span><span>elementIsVisible usa o elemento já encontrado.</span></li>
+            <li><span class="tick"></span><span>finally chama quit() se o assert passar ou falhar.</span></li>
+          </ul>
+        </article>
+        <div class="call tip">
+          <strong>COMANDO</strong>
+          Exporte LOGIN_EMAIL, LOGIN_PASSWORD e LOGIN_GREETING no terminal. Com o script do capítulo 4, npm test abre o Chrome, faz o login e fecha o navegador.
+        </div>
+        <div class="call warn">
+          <strong>HISTÓRICO</strong>
+          Publicar este arquivo novo não apaga a senha dos commits antigos. Troque a senha da conta no quick-notes.club.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <div class="sol">
+    <div class="sol-h"><span class="num">2</span><b>SCRIPT E DADOS</b><span class="hint">Dois arquivos, responsabilidades separadas</span></div>
+    <table>
+      <thead><tr><th style="width:28%">Lugar</th><th>Conteúdo</th></tr></thead>
+      <tbody>
+        <tr><td class="mono">package.json</td><td class="mono">"test": "mocha test/login.test.js --timeout 20000"</td></tr>
+        <tr><td>Ambiente do terminal</td><td>APP_URL, LOGIN_EMAIL, LOGIN_PASSWORD, LOGIN_GREETING=Hi, Hugo Moreira</td></tr>
+        <tr><td class="mono">test/login.test.js</td><td>Só o fluxo. Nenhum segredo. Chrome instalado na máquina que roda o teste.</td></tr>
+      </tbody>
+    </table>
+  </div>
+
+  <div class="check">
+    <h3><span class="tick"></span> CHECKLIST ANTES DE PUBLICAR</h3>
+    <div class="check-row">
+      <article><span class="tick"></span><span>O título diz que o login válido funciona.</span></article>
+      <article><span class="tick"></span><span>Arrange, Act e Assert continuam separados.</span></article>
+      <article><span class="tick"></span><span>A espera relocaliza #user-name.</span></article>
+      <article><span class="tick"></span><span>Senha, timeout, finally e npm test conferidos.</span></article>
+    </div>
+  </div>
+  <div class="apply">
+    <div class="sh"><span class="num">3</span><div><b>Publique nesta ordem</b><em>Arquivo, script e uma execução com o Chrome fechando sozinho</em></div></div>
+    <div class="apply-grid">
+      <article><span class="num">1</span><b>Substitua o teste</b><p>O it desta página entra no lugar do caso atual. Sem senha no fonte.</p></article>
+      <article><span class="num">2</span><b>Ajuste o package.json</b><p>npm test precisa abrir este arquivo pelo Mocha, com 20 segundos.</p></article>
+      <article><span class="num">3</span><b>Rode uma vez</b><p>Exporte as três variáveis. O teste verde termina com o Chrome fechado.</p></article>
+    </div>
+  </div>
+  <div class="foot"><span>Manual visual · Selenium WebDriver</span><span>Capítulo 6 · test/login.test.js</span></div>
+</section>
+
+</body>
+</html>
