@@ -1,0 +1,593 @@
+<!DOCTYPE html><html lang='pt-BR'><head><meta charset='utf-8'><title>Bíblia visual de engenharia de software</title><style>
+@page { size: A4; margin: 0; }
+* { box-sizing: border-box; }
+html, body { margin: 0; padding: 0; }
+body { font-family: Inter, "Noto Sans", sans-serif; color: #0f172a; -webkit-print-color-adjust: exact; print-color-adjust: exact; }
+.page { width: 210mm; height: 297mm; overflow: hidden; position: relative; background: #f4f7fb; padding: 8mm 7mm 5.5mm; display: flex; flex-direction: column; gap: 2.3mm; break-after: page; page-break-after: always; }
+.page:last-child { break-after: auto; page-break-after: auto; }
+.page::before { content: ""; position: absolute; top: 0; left: 0; right: 0; height: 3.2mm; background: linear-gradient(90deg, #1d4ed8, #0ea5e9); }
+.top { display: grid; grid-template-columns: 1.4fr 0.9fr; gap: 3mm; }
+.kicker { display: inline-flex; background: #1d4ed8; color: #fff; font-size: 8px; font-weight: 800; letter-spacing: 0.12em; padding: 3px 8px; border-radius: 999px; margin-bottom: 1.4mm; }
+h1 { margin: 0; font-size: 24px; line-height: 0.94; letter-spacing: -0.03em; font-weight: 800; color: #0b3f91; text-transform: uppercase; }
+.sub { margin: 1.4mm 0 0; font-size: 10px; line-height: 1.35; color: #334155; }
+.learn { background: #fff; border: 1.5px solid #bfdbfe; border-radius: 10px; padding: 2.2mm 2.8mm; }
+.learn h2 { margin: 0 0 1.4mm; font-size: 9px; letter-spacing: 0.08em; color: #1d4ed8; }
+.learn ul, ul.clean { margin: 0; padding: 0; list-style: none; display: flex; flex-direction: column; gap: 1.1mm; }
+.learn li, ul.clean li { display: flex; gap: 5px; align-items: flex-start; font-size: 9px; line-height: 1.28; }
+.tick { width: 12px; height: 12px; border-radius: 50%; background: #059669; display: inline-flex; align-items: center; justify-content: center; flex: none; margin-top: 1px; }
+.tick::after { content: ""; width: 5px; height: 3px; border-left: 1.5px solid #fff; border-bottom: 1.5px solid #fff; transform: rotate(-45deg) translate(0.5px, -0.5px); }
+.corpo { flex: 1; min-height: 0; display: flex; flex-direction: column; gap: 2.2mm; }
+.linha { display: grid; gap: 2.2mm; min-height: 0; }
+.card { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 2.2mm 2.6mm; display: flex; flex-direction: column; gap: 1.4mm; }
+.card.bad { background: #fff5f5; border-color: #fecdd3; }
+.card.good { background: #f0fdf4; border-color: #bbf7d0; }
+.sh { display: flex; gap: 2mm; align-items: flex-start; }
+.num { width: 18px; height: 18px; border-radius: 50%; background: #1d4ed8; color: #fff; font-size: 10px; font-weight: 800; display: inline-flex; align-items: center; justify-content: center; flex: none; }
+.sh b { display: block; font-size: 10px; letter-spacing: 0.02em; color: #0f2744; line-height: 1.15; text-transform: uppercase; }
+.sh em { display: block; margin-top: 1px; font-style: normal; font-size: 8px; color: #64748b; line-height: 1.25; }
+.body p { margin: 0 0 1.1mm; font-size: 9px; line-height: 1.35; color: #1e293b; }
+.body p:last-child { margin: 0; }
+.snippet { border-radius: 8px; overflow: hidden; border: 1px solid #1e293b; }
+.snippet-bar { background: #111827; color: #cbd5e1; font-size: 8px; display: flex; align-items: center; gap: 6px; padding: 3px 8px; font-family: "JetBrains Mono", ui-monospace, monospace; }
+.dots { display: inline-flex; gap: 3px; }
+.dots i { width: 6px; height: 6px; border-radius: 50%; display: block; }
+.dots i:nth-child(1) { background: #fb7185; } .dots i:nth-child(2) { background: #fbbf24; } .dots i:nth-child(3) { background: #34d399; }
+pre { margin: 0; background: #0b1220; color: #e2e8f0; padding: 5px 7px 6px; font-family: "JetBrains Mono", ui-monospace, monospace; font-size: 7.5px; line-height: 1.38; white-space: pre-wrap; }
+.sol { border: 1px solid #dbeafe; border-radius: 10px; overflow: hidden; background: #fff; }
+.sol-h { display: flex; align-items: center; gap: 2mm; padding: 1.4mm 2.2mm; background: #eff6ff; }
+.sol-h b { font-size: 9px; letter-spacing: 0.04em; color: #1e3a8a; }
+.sol-h .hint { margin-left: auto; font-size: 8px; color: #64748b; }
+table { width: 100%; border-collapse: collapse; font-size: 8px; }
+th { text-align: left; background: #1d4ed8; color: #fff; font-weight: 700; padding: 3px 6px; }
+td { padding: 3px 6px; border-bottom: 1px solid #e2e8f0; vertical-align: top; line-height: 1.3; background: #fff; }
+tr:nth-child(even) td { background: #f8fafc; }
+.check { background: #ecfdf5; border: 1px solid #a7f3d0; border-radius: 10px; padding: 1.6mm 2.2mm; }
+.check h3 { margin: 0 0 1.2mm; font-size: 9px; letter-spacing: 0.06em; color: #065f46; display: flex; align-items: center; gap: 6px; }
+.check-row { display: grid; grid-template-columns: 1fr 1fr 1fr 1fr; gap: 1.5mm; }
+.check-row article { display: flex; gap: 4px; align-items: flex-start; font-size: 8px; line-height: 1.25; color: #064e3b; }
+.foot { display: flex; justify-content: space-between; font-size: 7.5px; color: #94a3b8; }
+.cover-k { font-size: 10px; font-weight: 800; letter-spacing: 0.16em; color: #1d4ed8; }
+.mods { display: grid; grid-template-columns: 1fr 1fr 1fr; gap: 2.2mm; }
+.mod { background: #fff; border: 1px solid #e2e8f0; border-radius: 10px; padding: 2.4mm; border-top: 3.5px solid #1d4ed8; }
+.mod b { display: block; font-size: 8px; letter-spacing: 0.08em; color: #1d4ed8; }
+.mod h3 { margin: 0.6mm 0; font-size: 12px; color: #0f2744; }
+.mod p { margin: 0; font-size: 8.2px; line-height: 1.3; color: #334155; }
+</style></head><body><section class="page">
+  <div class="cover-k">BÍBLIA VISUAL</div>
+  <h1>Engenharia, arquitetura<br>e qualidade</h1>
+  <p class="sub">Manual prático para modernizar um núcleo de cartões: do domínio e do mainframe até Java, mensageria, PostgreSQL, testes e operação. Cada página traz definição, código aplicável e o que conferir antes de seguir.</p>
+  <div class="mods">
+    <article class="mod"><b>MÓDULO 1</b><h3>Fundamentos</h3><p>Clean Architecture, microsserviços, DDD, rotina de Dev, QA, Tech Lead, PO e negócio, regras de limite, BMAD, Git e IaC.</p></article>
+    <article class="mod" style="border-top-color:#0f766e"><b style="color:#0f766e">MÓDULO 2</b><h3>Ecossistema</h3><p>Java com Micronaut, Kafka, SNS, SQS e Transactional Outbox para não perder evento depois do commit.</p></article>
+    <article class="mod" style="border-top-color:#b45309"><b style="color:#b45309">MÓDULO 3</b><h3>Qualidade</h3><p>Pirâmide de testes, k6, JMeter, mutação com Pitest e integração com Testcontainers em Java.</p></article>
+    <article class="mod" style="border-top-color:#be123c"><b style="color:#be123c">MÓDULO 4</b><h3>Dados</h3><p>PostgreSQL, constraints, partição, índices B-Tree e GIN, EXPLAIN ANALYZE, Grafana e New Relic.</p></article>
+    <article class="mod" style="border-top-color:#6d28d9"><b style="color:#6d28d9">MÓDULO 5</b><h3>Mainframe</h3><p>COBOL, VSAM, copybook, JCL, mapa de estudo do Vision Plus e migração por Strangler Fig.</p></article>
+    <article class="mod" style="border-top-color:#0369a1"><b style="color:#0369a1">MÓDULO 6</b><h3>Jargão e IA</h3><p>LLM, RAG, tokens, P0, SLO, post-mortem, RFC e o uso diário de IA por Dev, QA e Tech Lead.</p></article>
+  </div>
+  <div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>O caso que atravessa o livro</b><em>Limite de cartão, do pedido até o saldo</em></div></div><div class='body'><p>Uma compra chega com PAN tokenizado, valor e moeda. O núcleo responde aprovado ou recusado. Se aprovar, o limite disponível desce na hora. No fim do dia a transação posta, entra na fatura e, se o titular não pagar o total, vira rotativo com juros. Os módulos seguintes usam esse mesmo caso.</p></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Como ler cada página</b><em>O desenho se repete de propósito</em></div></div><ul class='clean'><li><span class='tick'></span><span>O quadro azul lista o que a página entrega.</span></li><li><span class='tick'></span><span>O código é aplicável: Java, SQL, k6, HCL ou COBOL.</span></li><li><span class='tick'></span><span>A tabela liga situação, causa e ação.</span></li><li><span class='tick'></span><span>O checklist é a porta de saída da página.</span></li></ul></article></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>Capa</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · ARQUITETURA</div>
+      <h1>Clean Architecture<br>no limite do cartão</h1>
+      <p class="sub">A regra de dependência aponta para dentro. O domínio não conhece Micronaut, Kafka nem PostgreSQL.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Separar entidades, casos de uso, adaptadores e detalhes.</span></li><li><span class='tick'></span><span>Nomear a regra de dependência e o que ela proíbe.</span></li><li><span class='tick'></span><span>Ver um caso de uso Java que não importa framework.</span></li><li><span class='tick'></span><span>Saber o que é um porte e o que é um adaptador.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Quatro anéis</b><em>Dependência só aponta para o centro</em></div></div><div class='body'><p>Entidades guardam a regra: limite disponível é limite concedido menos o que já foi reservado e o que já postou. Casos de uso orquestram uma operação, como autorizar compra. Adaptadores traduzem HTTP, SQL e mensagem. Frameworks e drivers ficam no anel de fora. Um import de io.micronaut dentro da entidade quebra a regra.</p></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Porte e adaptador</b><em>O domínio define o contrato</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>AutorizarCompra.java</div><pre>public interface LimiteRepository {
+    Optional&lt;ContaCartao&gt; buscar(ContaId id);
+    void salvar(ContaCartao conta);
+}
+
+public final class AutorizarCompra {
+    private final LimiteRepository limites;
+    public AutorizarCompra(LimiteRepository limites) {
+        this.limites = limites;
+    }
+    public Recibo executar(Pedido pedido) {
+        ContaCartao conta = limites.buscar(pedido.conta())
+            .orElseThrow(() -&gt; new ContaInexistente(pedido.conta()));
+        conta.reservar(pedido.valor());
+        limites.salvar(conta);
+        return Recibo.aprovado(pedido);
+    }
+}</pre></div></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>O que fica fora do domínio</b><em>Detalhe não entra na regra</em></div></div><ul class='clean'><li><span class='tick'></span><span>Anotação de controller, entidade JPA e cliente Kafka.</span></li><li><span class='tick'></span><span>SQL, DSN de banco e nome de tópico.</span></li><li><span class='tick'></span><span>Código de resposta ISO 8583 traduzido na borda, não espalhado no cálculo.</span></li><li><span class='tick'></span><span>Relógio e gerador de id entram por porte quando a regra depende deles.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Teste do miolo</b><em>Sem banco e sem rede</em></div></div><div class='body'><p>O teste de AutorizarCompra usa um LimiteRepository em memória. Aprova quando o disponível cobre o valor. Recusa quando não cobre. Esse teste não sobe Docker. A integração com PostgreSQL é outro teste, no módulo de qualidade.</p></div></article></div><div class='sol'><div class='sol-h'><b>ONDE CADA MUDANÇA ENTRA</b><span class='hint'>Regra no centro, detalhe na borda</span></div><table><thead><tr><th>Mudança</th><th>Anel</th><th>Sinal de que foi para o lugar errado</th></tr></thead><tbody><tr><td>Fórmula do disponível</td><td>Entidade</td><td>A fórmula aparece só no SQL</td></tr><tr><td>Ordem reservar e gravar</td><td>Caso de uso</td><td>O controller faz os dois passos</td></tr><tr><td>JSON do POST</td><td>Adaptador</td><td>A entidade tem campo chamado payload</td></tr><tr><td>Timeout do driver</td><td>Detalhe</td><td>O caso de uso captura SQLException</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA REGRA DE DEPENDÊNCIA</h3><div class='check-row'><article><span class='tick'></span><span>Domínio compila sem o framework.</span></article><article><span class='tick'></span><span>Caso de uso recebe portes no construtor.</span></article><article><span class='tick'></span><span>SQL mora no adaptador.</span></article><article><span class='tick'></span><span>Teste de regra não abre socket.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>2 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · MICROSSERVIÇOS</div>
+      <h1>Um serviço por<br>contexto, um banco</h1>
+      <p class="sub">Microsserviço é uma fronteira de mudança e de dados. Não é uma pasta a mais no mesmo banco.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Decidir o corte pelo fluxo de negócio.</span></li><li><span class='tick'></span><span>Comparar chamada síncrona e evento.</span></li><li><span class='tick'></span><span>Ver o que quebra quando dois serviços compartilham tabela.</span></li><li><span class='tick'></span><span>Aplicar timeout na chamada que não pode segurar a autorização.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Corte deste domínio</b><em>Três serviços, três bancos</em></div></div><ul class='clean'><li><span class='tick'></span><span>Autorização: decide na hora e reserva limite. Latência baixa.</span></li><li><span class='tick'></span><span>Postagem: confirma a transação no fim do ciclo e tira a reserva.</span></li><li><span class='tick'></span><span>Fatura: fecha o ciclo, calcula rotativo e emite o boleto.</span></li><li><span class='tick'></span><span>Cadastro de produto e plástico não entra no caminho quente da autorização.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Banco por serviço</b><em>Tabela compartilhada acopla o deploy</em></div></div><div class='body'><p>Se autorização e fatura leem a mesma tabela limite, a migração de coluna trava os dois. Cada serviço é dono do seu esquema. A fatura não dá SELECT no banco da autorização. Ela consome o evento LimiteAlterado ou pergunta uma API dona do dado. O nome desse desenho é database per service.</p></div></article></div><div class='linha' style='grid-template-columns:1.2fr 0.8fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Síncrono só no caminho que precisa da resposta</b><em>O resto vira evento</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>fronteiras.txt</div><pre>Autorização  --HTTP, prazo curto--&gt; Risco
+Autorização  --evento--&gt; Postagem
+Postagem     --evento--&gt; Fatura
+Fatura       --não chama--&gt; Autorização no meio da compra</pre></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Timeout é parte do contrato</b><em>Sem prazo, a falha vira fila</em></div></div><div class='body'><p>A chamada de autorização ao risco tem prazo de dezenas de milissegundos e uma resposta padrão se o prazo estourar: recusar ou seguir a política escrita. Sem esse padrão, um risco lento segura todas as compras. O padrão de isolar essa falha se chama bulkhead quando o pool de threads também é separado.</p></div></article></div><div class='sol'><div class='sol-h'><b>SINCRONO OU EVENTO</b><span class='hint'>A pergunta é se o chamador precisa da resposta agora</span></div><table><thead><tr><th>Situação</th><th>Estilo</th><th>Por quê</th></tr></thead><tbody><tr><td>Compra no caixa</td><td>Síncrono</td><td>O terminal espera aprovado ou recusado</td></tr><tr><td>Montar a fatura</td><td>Evento</td><td>Pode acontecer depois da compra</td></tr><tr><td>Dois serviços, uma tabela</td><td>Nenhum dos dois</td><td>Acople de esquema, não de mensagem</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO CORTE</h3><div class='check-row'><article><span class='tick'></span><span>Cada serviço tem o próprio esquema.</span></article><article><span class='tick'></span><span>O caminho quente tem prazo.</span></article><article><span class='tick'></span><span>Evento tem dono e nome de negócio.</span></article><article><span class='tick'></span><span>Ninguém consulta tabela alheia.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>3 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · DDD</div>
+      <h1>Domínio: conta,<br>dinheiro e reserva</h1>
+      <p class="sub">DDD, Domain-Driven Design, coloca o vocabulário do negócio dentro do código. O agregado é a fronteira transacional.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Distinguir entidade, objeto de valor e agregado.</span></li><li><span class='tick'></span><span>Manter o invariante do limite dentro da conta.</span></li><li><span class='tick'></span><span>Publicar um fato de domínio depois da reserva.</span></li><li><span class='tick'></span><span>Evitar um agregado que carrega o cliente inteiro.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Vocabulário</b><em>O nome no código é o nome na mesa</em></div></div><ul class='clean'><li><span class='tick'></span><span>Entidade: tem identidade. ContaCartao continua ela mesma se o limite mudar.</span></li><li><span class='tick'></span><span>Objeto de valor: Dinheiro e ContaId se comparam pelo conteúdo.</span></li><li><span class='tick'></span><span>Agregado: ContaCartao mais as reservas. Uma transação altera o agregado inteiro.</span></li><li><span class='tick'></span><span>Repositório: busca e grava o agregado. Não é um DAO genérico de qualquer tabela.</span></li><li><span class='tick'></span><span>Evento de domínio: LimiteReservado. Aconteceu. Não é um comando.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Invariante no agregado</b><em>Disponível nunca fica negativo</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>ContaCartao.java</div><pre>public void reservar(Dinheiro valor) {
+    if (valor.sinal() != Sinal.POSITIVO) {
+        throw new ValorInvalido(valor);
+    }
+    Dinheiro disponivel = limite.menos(reservado).menos(postado);
+    if (valor.maiorQue(disponivel)) {
+        throw new LimiteInsuficiente(id, disponivel, valor);
+    }
+    reservado = reservado.mais(valor);
+    eventos.add(new LimiteReservado(id, valor));
+}</pre></div></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>O que não entra no agregado</b><em>Agregado grande trava linha demais</em></div></div><div class='body'><p>O nome do titular, o endereço e o histórico de dez anos não viajam na autorização. A conta guarda limite, reservado e postado. O histórico mora no serviço de transações. Ubíquo quer dizer que QA, PO e Dev usam a mesma palavra: reserva não é bloqueio e não é postagem.</p></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Comando e fato</b><em>Pedir é diferente de ter acontecido</em></div></div><div class='body'><p>ReservarLimite é um comando: pode falhar. LimiteReservado é um fato: já passou no invariante. O outbox do módulo 2 publica o fato. O consumidor não reabre a conta para decidir de novo a mesma compra.</p></div></article></div><div class='sol'><div class='sol-h'><b>PEÇA DE DDD</b><span class='hint'>Use o nome certo na revisão</span></div><table><thead><tr><th>Peça</th><th>Pergunta que responde</th><th>Exemplo</th></tr></thead><tbody><tr><td>Entidade</td><td>Quem é?</td><td>Conta 123</td></tr><tr><td>Objeto de valor</td><td>Quanto ou qual código?</td><td>BRL 50,00</td></tr><tr><td>Agregado</td><td>O que muda junto?</td><td>Conta e suas reservas</td></tr><tr><td>Evento</td><td>O que já ocorreu?</td><td>LimiteReservado</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO AGREGADO</h3><div class='check-row'><article><span class='tick'></span><span>Invariante está na entidade.</span></article><article><span class='tick'></span><span>Repositório grava o agregado inteiro.</span></article><article><span class='tick'></span><span>Evento nasce dentro da operação.</span></article><article><span class='tick'></span><span>QA e Dev usam a mesma palavra.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>4 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · ROTINA</div>
+      <h1>O dia de Dev<br>e de QA</h1>
+      <p class="sub">Entregável é o que outra pessoa consegue usar sem perguntar de novo: PR, teste, evidência e defeito reproduzível.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Ver a rotina de um dev Java neste domínio.</span></li><li><span class='tick'></span><span>Ver a rotina de um QA Engineer no mesmo fluxo.</span></li><li><span class='tick'></span><span>Separar defeito de dúvida de regra.</span></li><li><span class='tick'></span><span>Saber o artefato que cada um entrega no mesmo dia.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Dev Java</b><em>Do quadro até o PR verificável</em></div></div><ul class='clean'><li><span class='tick'></span><span>De manhã: lê o quadro, o alerta da noite e o PR que ficou aberto.</span></li><li><span class='tick'></span><span>Antes de codar: escreve o exemplo de aprovado e o de limite insuficiente.</span></li><li><span class='tick'></span><span>Durante: altera o agregado, o adaptador e o teste. Não mistura refatoração cega com regra nova.</span></li><li><span class='tick'></span><span>Antes do PR: mvnw verify local, descrição do risco, como testar e o que observar em produção.</span></li><li><span class='tick'></span><span>Desafio típico: a regra de arredondamento do juros não está no cartão da história.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>QA Engineer</b><em>Qualidade não começa no fim da sprint</em></div></div><ul class='clean'><li><span class='tick'></span><span>De manhã: olha falhas de pipeline, defeitos abertos e a história que entra em refinamento.</span></li><li><span class='tick'></span><span>No refinamento: transforma a regra em exemplos. Limite 1000, reserva 200, compra 900, recusa.</span></li><li><span class='tick'></span><span>Na história: revisa o teste de unidade do dev e acrescenta integração e contrato.</span></li><li><span class='tick'></span><span>Evidência: pedido, resposta, id da conta de teste e consulta do saldo depois.</span></li><li><span class='tick'></span><span>Desafio típico: um único usuário de teste compartilhado por todo o time. O módulo 3 trata disso.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>O que cada um entrega hoje</b><em>Se não tem artefato, a atividade não terminou</em></div></div><ul class='clean'><li><span class='tick'></span><span>Dev entrega PR pequeno, teste automático e nota de migração se houve SQL.</span></li><li><span class='tick'></span><span>QA entrega exemplos na história, defeito com passos e decisão de risco do release.</span></li><li><span class='tick'></span><span>Os dois recusam um PR que só tem teste do caminho feliz da autorização.</span></li></ul></article></div><div class='sol'><div class='sol-h'><b>RITO DA SEMANA</b><span class='hint'>Presença com entrega</span></div><table><thead><tr><th>Rito</th><th>Dev leva</th><th>QA leva</th></tr></thead><tbody><tr><td>Refinamento</td><td>Dúvida técnica e estimativa</td><td>Exemplos e buraco de regra</td></tr><tr><td>Diário</td><td>Bloqueio real</td><td>Ambiente ou dado quebrado</td></tr><tr><td>Review</td><td>PR e risco</td><td>Evidência e buraco de teste</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO DIA</h3><div class='check-row'><article><span class='tick'></span><span>História tem exemplo numérico.</span></article><article><span class='tick'></span><span>PR explica como provar.</span></article><article><span class='tick'></span><span>Defeito tem passo e resultado.</span></article><article><span class='tick'></span><span>Caminho de recusa tem teste.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>5 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · ROTINA</div>
+      <h1>Tech Lead, PO<br>e negócio</h1>
+      <p class="sub">Tech Lead protege o sistema. PO ordena o valor. Analista de negócios traduz a regra até ela ficar testável.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Ver o que o Tech Lead decide e o que ele não acumula.</span></li><li><span class='tick'></span><span>Ver o entregável do Product Owner.</span></li><li><span class='tick'></span><span>Ver como o analista de negócios escreve uma regra.</span></li><li><span class='tick'></span><span>Separar prioridade de negócio de severidade de produção.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Tech Lead</b><em>Arquitetura no cotidiano</em></div></div><ul class='clean'><li><span class='tick'></span><span>De manhã: incidente, fila de PR e capacidade do time.</span></li><li><span class='tick'></span><span>Desenha a fronteira antes de abrir a história grande.</span></li><li><span class='tick'></span><span>Escreve ADR, Architecture Decision Record, quando a decisão custa caro para reverter.</span></li><li><span class='tick'></span><span>Não é o único revisor. É o desbloqueio e o padrão.</span></li><li><span class='tick'></span><span>Entrega: ADR, plano de rollout e meta de SLO do serviço.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Product Owner</b><em>Ordem e corte</em></div></div><ul class='clean'><li><span class='tick'></span><span>Mantém o objetivo do ciclo: reduzir recusa indevida, por exemplo.</span></li><li><span class='tick'></span><span>Corta a história até caber uma regra testável.</span></li><li><span class='tick'></span><span>Diz o que fica de fora com a mesma clareza do que entra.</span></li><li><span class='tick'></span><span>Aceita a história com o exemplo combinado, não com uma demo só feliz.</span></li><li><span class='tick'></span><span>Entrega: backlog ordenado e critério de aceite.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>3</span><div><b>Analista de negócios</b><em>Regra sem adjetivo</em></div></div><ul class='clean'><li><span class='tick'></span><span>Entrevista operação, financeiro e o especialista do legado.</span></li><li><span class='tick'></span><span>Escreve a regra com número, exceção e dono.</span></li><li><span class='tick'></span><span>Marca o que é regulatório, como IOF, e o que é política da empresa.</span></li><li><span class='tick'></span><span>Aponta o copybook ou a tela do legado que ainda manda na regra.</span></li><li><span class='tick'></span><span>Entrega: regra versionada e glossário do termo.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>4</span><div><b>Severidade não é prioridade de backlog</b><em>P0 é produção. P1 de produto é ordem.</em></div></div><div class='body'><p>P0, P1 e P2 neste livro são severidade de defeito em produção. P0: autorização fora do ar ou limite calculado errado para todos. P1: degradação com contorno. P2: defeito contido. A ordem do backlog do PO usa outro eixo: valor e risco. Misturar os dois números faz um ajuste de texto furar a fila de um P0.</p></div></article></div><div class='sol'><div class='sol-h'><b>QUEM DECIDE</b><span class='hint'>Uma pergunta, um dono</span></div><table><thead><tr><th>Pergunta</th><th>Dono</th><th>Artefato</th></tr></thead><tbody><tr><td>Esta regra entra agora?</td><td>PO</td><td>Backlog</td></tr><tr><td>Qual serviço é dono do dado?</td><td>Tech Lead</td><td>ADR</td></tr><tr><td>Qual é a fórmula do rotativo?</td><td>Analista de negócios</td><td>Regra numerada</td></tr><tr><td>O teste prova a fórmula?</td><td>QA</td><td>Exemplo e evidência</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA DECISÃO</h3><div class='check-row'><article><span class='tick'></span><span>ADR cabe numa página.</span></article><article><span class='tick'></span><span>Regra tem número e exceção.</span></article><article><span class='tick'></span><span>Aceite usa o exemplo.</span></article><article><span class='tick'></span><span>P0 não entra na fila comum.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>6 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · REGRAS</div>
+      <h1>Mapear limite<br>sem decorar o legado</h1>
+      <p class="sub">Regra de negócio aprendida é exemplo executável. Cartão de crédito é um bom domínio porque cada palavra muda dinheiro.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Calcular disponível com reserva, postagem e pagamento.</span></li><li><span class='tick'></span><span>Separar autorização, confirmação, fatura e rotativo.</span></li><li><span class='tick'></span><span>Usar example mapping para achar buraco.</span></li><li><span class='tick'></span><span>Tratar exceção de nome parecido: estorno, chargeback e ajuste.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>A fórmula de estudo</b><em>Quatro saldos, um disponível</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>limite.txt</div><pre>disponivel = concedido
+           - reservado
+           - postado
+           + pagamento_nao_faturado
+
+compra 900 com disponivel 800 -&gt; recusa
+compra 100 com disponivel 800 -&gt; reserva 100
+postagem da reserva        -&gt; reservado cai, postado sobe
+pagamento 100 antes do corte -&gt; disponivel sobe 100</pre></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Example mapping</b><em>Cartão amarelo é dúvida, não chute</em></div></div><div class='body'><p>Uma história vira cartões. Azul: a regra. Verde: o exemplo com número. Vermelho: a pergunta sem dono. Amarelo vazio significa que a história ainda não pode ser estimada. Exemplo verde: concedido 1000, reservado 200, postado 300, compra 500, aprova e reservado fica 700. Exemplo vermelho: a compra internacional usa o limite em qual moeda?</p></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Palavras que o time confunde</b><em>Glossário mínimo do cartão</em></div></div><ul class='clean'><li><span class='tick'></span><span>Autorização reserva. Não gera ainda a linha da fatura.</span></li><li><span class='tick'></span><span>Postagem, ou clearing, confirma a transação e move o valor para postado.</span></li><li><span class='tick'></span><span>Estorno devolve uma compra do próprio lojista. Chargeback é disputa pela bandeira.</span></li><li><span class='tick'></span><span>Rotativo é o saldo não pago depois do vencimento, com juros. Não é o limite.</span></li><li><span class='tick'></span><span>IOF, no Brasil, é tributo sobre operação de crédito. A alíquota não mora espalhada em ifs. Mora numa tabela vigente com data.</span></li></ul></article></div><div class='sol'><div class='sol-h'><b>COMO APRENDER UM DOMÍNIO FECHADO</b><span class='hint'>Fonte, exemplo, prova</span></div><table><thead><tr><th>Passo</th><th>Ação</th><th>Pronto quando</th></tr></thead><tbody><tr><td>Achar a fonte</td><td>Operação, legado e norma</td><td>Cada regra cita a origem</td></tr><tr><td>Numerar</td><td>Example mapping</td><td>Todo verde tem conta de chegada</td></tr><tr><td>Provar</td><td>Teste de agregado</td><td>O vermelho virou verde ou ficou explícito fora de escopo</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA REGRA</h3><div class='check-row'><article><span class='tick'></span><span>Disponível tem fórmula única.</span></article><article><span class='tick'></span><span>Reserva e postagem estão separadas.</span></article><article><span class='tick'></span><span>Estorno não se chama chargeback.</span></article><article><span class='tick'></span><span>Tributo tem vigência.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>7 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · BMAD</div>
+      <h1>Comportamento, modelo,<br>API e dados</h1>
+      <p class="sub">BMAD aqui é o alinhamento dessas quatro camadas. Se uma muda sem as outras, o time entrega um contrato que mente.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Amarrar comportamento, modelo, API e dados na mesma história.</span></li><li><span class='tick'></span><span>Ver um exemplo completo de reserva de limite.</span></li><li><span class='tick'></span><span>Detectar quando a API promete o que o banco não guarda.</span></li><li><span class='tick'></span><span>Usar isso no refinamento, não só no desenho.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>As quatro letras</b><em>Uma história preenche as quatro</em></div></div><ul class='clean'><li><span class='tick'></span><span>B, Behavior: dado concedido 1000 e reservado 0, quando a compra é 400, então aprova e o disponível fica 600.</span></li><li><span class='tick'></span><span>M, Model: agregado ContaCartao, invariante do disponível, evento LimiteReservado.</span></li><li><span class='tick'></span><span>A, API: POST /autorizacoes com valor e chave de idempotência. 201 aprovado, 422 limite insuficiente.</span></li><li><span class='tick'></span><span>D, Data: colunas concedido, reservado, postado e a linha do outbox na mesma transação.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>O desencontro típico</b><em>Cada camada conta uma história</em></div></div><div class='body'><p>A API devolve aprovado, o teste olha só o HTTP 201 e a coluna reservado não muda. O comportamento diz que a reserva existe. O modelo tem o método. O dado não persistiu. BMAD falha. A história só fecha quando o teste integrado lê a coluna e o evento.</p></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>No refinamento</b><em>Quadro de uma folha</em></div></div><div class='body'><p>O analista traz o comportamento numerado. O dev desenha modelo e API. O QA aponta o dado que prova os dois. O PO corta o que não cabe nas quatro células. Se a célula D diz que o legado guarda o limite em centavos inteiros e a API fala em decimal, a conversão entra na história, não vira surpresa na migração.</p></div></article></div><div class='sol'><div class='sol-h'><b>CÉLULA VAZIA</b><span class='hint'>Não estime por cima do buraco</span></div><table><thead><tr><th>Vazio</th><th>Risco</th><th>Ação</th></tr></thead><tbody><tr><td>Sem comportamento</td><td>Cada um testa uma regra</td><td>Escrever o exemplo com número</td></tr><tr><td>Sem modelo</td><td>Regra fica no controller</td><td>Nomear agregado e invariante</td></tr><tr><td>Sem API</td><td>Contrato nasce no código</td><td>Fixar status e corpo</td></tr><tr><td>Sem dado</td><td>O teste não prova persistência</td><td>Nomear tabela e coluna</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST BMAD</h3><div class='check-row'><article><span class='tick'></span><span>Comportamento tem número.</span></article><article><span class='tick'></span><span>Modelo tem invariante.</span></article><article><span class='tick'></span><span>API tem status de recusa.</span></article><article><span class='tick'></span><span>Dado prova a reserva.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>8 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 1 · ENTREGA</div>
+      <h1>Git, pipeline<br>e infraestrutura</h1>
+      <p class="sub">IaC, Infrastructure as Code, é a infraestrutura revisada como código. Pipeline é o portão que impede a main de receber o que não passou no teste.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Escolher trunk-based para este serviço.</span></li><li><span class='tick'></span><span>Ler um pipeline mínimo de GitHub Actions e de GitLab.</span></li><li><span class='tick'></span><span>Ver um recurso AWS descrito em Terraform.</span></li><li><span class='tick'></span><span>Saber o que não entra no Git: segredo e estado remoto com credencial.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Branching</b><em>Trunk curto, release protegida</em></div></div><div class='body'><p>Trunk-based: a branch principal recebe PR pequenos várias vezes ao dia. Feature flag esconde regra incompleta. GitFlow, com develop e release longos, cabe em produto com versão empacotada. Um serviço de autorização contínuo fica melhor no trunk. O PR passa por verificação antes do merge. Isso é o quality gate: o portão automático de teste, análise e política.</p></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>GitHub Actions</b><em>O mesmo comando que o dev roda</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>verificar.yml</div><pre>name: verificar
+on:
+  pull_request:
+jobs:
+  teste:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - run: ./mvnw -B verify</pre></div></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>GitLab CI</b><em>Estágios explícitos</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>.gitlab-ci.yml</div><pre>stages: [teste, imagem]
+unitario:
+  stage: teste
+  script:
+    - ./mvnw -B verify
+imagem:
+  stage: imagem
+  script:
+    - docker build -t autorizacao:$CI_COMMIT_SHA .
+  rules:
+    - if: $CI_COMMIT_BRANCH == &quot;main&quot;</pre></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Terraform da fila</b><em>A fila nasce revisada</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>fila.tf</div><pre>resource &quot;aws_sqs_queue&quot; &quot;autorizacoes&quot; {
+  name                       = &quot;cartao-autorizacoes&quot;
+  message_retention_seconds  = 345600
+  visibility_timeout_seconds = 30
+}
+# estado no backend remoto
+# segredo em variavel, nunca no .tf</pre></div></article></div><div class='sol'><div class='sol-h'><b>ONDE MORA CADA COISA</b><span class='hint'>Código sim, segredo não</span></div><table><thead><tr><th>Item</th><th>Lugar</th><th>Fora do Git</th></tr></thead><tbody><tr><td>Pipeline</td><td>Repositório</td><td>Token de deploy</td></tr><tr><td>Terraform</td><td>Repositório</td><td>Arquivo de estado com senha</td></tr><tr><td>Feature flag</td><td>Configuração do ambiente</td><td>Lista de clientes reais</td></tr><tr><td>ADR</td><td>docs/adr</td><td>Discussão só no chat</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DE ENTREGA</h3><div class='check-row'><article><span class='tick'></span><span>PR menor que uma regra.</span></article><article><span class='tick'></span><span>Pipeline roda mvnw verify.</span></article><article><span class='tick'></span><span>IaC da fila está no PR.</span></article><article><span class='tick'></span><span>Segredo não aparece no diff.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>9 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 2 · JAVA</div>
+      <h1>Micronaut na borda,<br>domínio no centro</h1>
+      <p class="sub">Micronaut sobe a aplicação, injeta o adaptador e publica o HTTP. A regra de limite continua na classe pura do módulo 1.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Ver um controller que só traduz HTTP.</span></li><li><span class='tick'></span><span>Ver o adaptador que implementa o porte.</span></li><li><span class='tick'></span><span>Usar chave de idempotência na autorização.</span></li><li><span class='tick'></span><span>Subir o serviço com o comando do Maven.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Controller</b><em>Status é decisão de borda</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>AutorizacaoController.java</div><pre>@Controller(&quot;/autorizacoes&quot;)
+public class AutorizacaoController {
+    private final AutorizarCompra caso;
+    public AutorizacaoController(AutorizarCompra caso) {
+        this.caso = caso;
+    }
+    @Post
+    public HttpResponse&lt;?&gt; criar(@Body PedidoHttp req) {
+        try {
+            Recibo recibo = caso.executar(req.paraPedido());
+            return HttpResponse.created(recibo);
+        } catch (LimiteInsuficiente e) {
+            return HttpResponse.unprocessableEntity().body(e.paraCorpo());
+        }
+    }
+}</pre></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Idempotência</b><em>O caixa repete o pedido</em></div></div><div class='body'><p>O terminal reenvia o mesmo POST quando a resposta se perde. A chave Idempotency-Key entra no adaptador. Se a chave já tem recibo gravado, o controller devolve o mesmo recibo e não reserva de novo. Sem essa chave, uma compra vira duas reservas. A chave é dado da borda, consultada antes do caso de uso.</p></div></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Adaptador do repositório</b><em>Implementa o porte, não a regra</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>LimiteJdbc.java</div><pre>@Singleton
+public class LimiteJdbc implements LimiteRepository {
+    private final JdbcOperations jdbc;
+    public Optional&lt;ContaCartao&gt; buscar(ContaId id) {
+        return jdbc.queryOptional(SQL_BUSCA, id.valor())
+            .map(ContaCartao::reidratar);
+    }
+    public void salvar(ContaCartao conta) {
+        jdbc.update(SQL_ATUALIZA, conta.reservado().centavos(), conta.id().valor());
+    }
+}</pre></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Comandos</b><em>O que o dev roda</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>terminal</div><pre>./mvnw -B test
+./mvnw -B mn:run
+curl -s -X POST :8080/autorizacoes \
+  -H &#x27;Content-Type: application/json&#x27; \
+  -H &#x27;Idempotency-Key: caixa-88&#x27; \
+  -d &#x27;{&quot;conta&quot;:&quot;123&quot;,&quot;valor&quot;:&quot;50.00&quot;,&quot;moeda&quot;:&quot;BRL&quot;}&#x27;</pre></div></article></div><div class='sol'><div class='sol-h'><b>RESPOSTA HTTP</b><span class='hint'>O domínio não devolve status</span></div><table><thead><tr><th>Resultado</th><th>Status</th><th>Corpo</th></tr></thead><tbody><tr><td>Reserva feita</td><td>201</td><td>Recibo com id</td></tr><tr><td>Limite insuficiente</td><td>422</td><td>Disponível e valor pedido</td></tr><tr><td>Conta inexistente</td><td>404</td><td>Identificador</td></tr><tr><td>Chave repetida</td><td>200 ou 201</td><td>O mesmo recibo da primeira vez</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO ADAPTADOR</h3><div class='check-row'><article><span class='tick'></span><span>Controller sem fórmula.</span></article><article><span class='tick'></span><span>Idempotência antes da reserva.</span></article><article><span class='tick'></span><span>SQL só no Jdbc.</span></article><article><span class='tick'></span><span>422 é recusa de negócio.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>10 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 2 · MENSAGERIA</div>
+      <h1>Kafka, SNS<br>e SQS</h1>
+      <p class="sub">Os três carregam mensagem. Diferem em ordenação, consumo e quem fala com quem. EDA, Event-Driven Architecture, é o desenho em que o fato circula sem o produtor esperar o consumidor.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Escolher o sistema pelo contrato de consumo.</span></li><li><span class='tick'></span><span>Ver producer Kafka e envio SQS em Java.</span></li><li><span class='tick'></span><span>Entender fan-out do SNS.</span></li><li><span class='tick'></span><span>Tratar repetição: consumidor idempotente.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Kafka</b><em>Log particionado</em></div></div><ul class='clean'><li><span class='tick'></span><span>A mensagem fica no log até a retenção.</span></li><li><span class='tick'></span><span>Partição ordena a chave. A conta é uma boa chave.</span></li><li><span class='tick'></span><span>Consumer group divide partições. Cada mensagem do grupo vai a um membro.</span></li><li><span class='tick'></span><span>Dá para reler o passado. Serve auditoria e novo consumidor.</span></li><li><span class='tick'></span><span>Operação própria ou MSK na AWS.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>SQS</b><em>Fila de trabalho</em></div></div><ul class='clean'><li><span class='tick'></span><span>Cada mensagem é retirada por um consumidor.</span></li><li><span class='tick'></span><span>Standard não garante ordem. FIFO garante ordem por grupo.</span></li><li><span class='tick'></span><span>Invisível depois do receive até o visibility timeout.</span></li><li><span class='tick'></span><span>Se o worker falha, a mensagem volta. DLQ guarda o que estourou a tentativa.</span></li><li><span class='tick'></span><span>Não foi feito para dezenas de consumidores lerem o mesmo fato.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>3</span><div><b>SNS</b><em>Aviso em leque</em></div></div><ul class='clean'><li><span class='tick'></span><span>Publica uma vez. Vários assinantes recebem.</span></li><li><span class='tick'></span><span>Assinante pode ser SQS, Lambda ou HTTP.</span></li><li><span class='tick'></span><span>O padrão SNS para SQS isola o ritmo de cada consumidor.</span></li><li><span class='tick'></span><span>Não guarda histórico longo para um consumidor novo reler.</span></li><li><span class='tick'></span><span>Bom para o fato LimiteReservado acordar fatura e fraude.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>4</span><div><b>Kafka em Java</b><em>Chave é a conta</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>PublicarKafka.java</div><pre>ProducerRecord&lt;String, String&gt; registro = new ProducerRecord&lt;&gt;(
+    &quot;cartao.limite.reservado&quot;, contaId, json);
+producer.send(registro).get(2, TimeUnit.SECONDS);</pre></div></article><article class='card'><div class='sh'><span class='num'>5</span><div><b>SQS em Java</b><em>Uma fila, um trabalho</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>PublicarSqs.java</div><pre>sqs.sendMessage(SendMessageRequest.builder()
+    .queueUrl(url)
+    .messageBody(json)
+    .messageGroupId(contaId) // só em FIFO
+    .build());</pre></div></article></div><div class='sol'><div class='sol-h'><b>QUAL USAR NESTE DOMÍNIO</b><span class='hint'>Fato amplo no Kafka ou SNS. Trabalho pontual no SQS</span></div><table><thead><tr><th>Necessidade</th><th>Escolha</th><th>Motivo</th></tr></thead><tbody><tr><td>Vários serviços releem o fato</td><td>Kafka</td><td>Log retido e novo consumidor</td></tr><tr><td>Avisar fatura e fraude já na AWS</td><td>SNS para SQS</td><td>Fan-out com fila própria</td></tr><tr><td>Gerar um PDF de fatura</td><td>SQS</td><td>Um worker, uma tarefa</td></tr><tr><td>Ordem por conta</td><td>Kafka ou SQS FIFO</td><td>Chave ou message group</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA MENSAGEM</h3><div class='check-row'><article><span class='tick'></span><span>Nome do tópico é fato.</span></article><article><span class='tick'></span><span>Consumidor aguenta repetição.</span></article><article><span class='tick'></span><span>DLQ existe na fila de trabalho.</span></article><article><span class='tick'></span><span>Chave da conta preserva ordem.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>11 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 2 · CONSISTÊNCIA</div>
+      <h1>Transactional<br>Outbox</h1>
+      <p class="sub">Gravar o banco e publicar a mensagem em duas chamadas perde o evento ou publica um fato que não existe. O outbox grava os dois na mesma transação.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Ver o problema do dual write.</span></li><li><span class='tick'></span><span>Criar a tabela outbox.</span></li><li><span class='tick'></span><span>Inserir o evento no mesmo commit da reserva.</span></li><li><span class='tick'></span><span>Publicar depois, com confirmação, sem mandar duas reservas.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>O buraco</b><em>Duas escritas, uma falha</em></div></div><div class='body'><p>Se o serviço faz commit da reserva e o Kafka recusa, o limite baixou e a fatura não fica sabendo. Se publica antes do commit e o commit falha, a fatura recebe uma reserva que não existe. As duas ordens quebram. Dual write é esse par de escritas sem uma transação só.</p></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Tabela</b><em>O evento é linha</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>outbox.sql</div><pre>CREATE TABLE outbox (
+  id uuid PRIMARY KEY,
+  aggregate_id text NOT NULL,
+  tipo text NOT NULL,
+  payload jsonb NOT NULL,
+  criado_em timestamptz NOT NULL DEFAULT now(),
+  publicado_em timestamptz
+);
+CREATE INDEX outbox_pendente
+  ON outbox (criado_em)
+  WHERE publicado_em IS NULL;</pre></div></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Mesmo commit</b><em>Reserva e fato nascem juntos</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>AutorizarComOutbox.java</div><pre>@Transactional
+public Recibo executar(Pedido pedido) {
+    ContaCartao conta = limites.buscar(pedido.conta()).orElseThrow();
+    conta.reservar(pedido.valor());
+    limites.salvar(conta);
+    jdbc.update(INSERT_OUTBOX, uuid(), conta.id(),
+        &quot;LimiteReservado&quot;, conta.ultimoEventoJson());
+    return Recibo.aprovado(pedido);
+}</pre></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Publicador</b><em>Marca só depois do broker aceitar</em></div></div><div class='body'><p>Um processo lê as linhas com publicado_em nulo, envia ao Kafka e só então preenche publicado_em. Se cair no meio, a linha continua pendente e o envio se repete. Por isso o consumidor trata LimiteReservado pelo id do evento. Debezium no log do Postgres é a outra forma: lê o WAL e publica, sem poller. O invariante é o mesmo: nada sai antes do commit.</p></div></article></div><div class='sol'><div class='sol-h'><b>FALHA NO MEIO DO OUTBOX</b><span class='hint'>A linha pendente é a fonte da verdade</span></div><table><thead><tr><th>Momento</th><th>Estado</th><th>Ação</th></tr></thead><tbody><tr><td>Commit ok, publish não</td><td>Linha pendente</td><td>Publicador tenta de novo</td></tr><tr><td>Publish ok, update não</td><td>Linha ainda pendente</td><td>Reenvio. Consumidor ignora id repetido</td></tr><tr><td>Commit falhou</td><td>Sem linha</td><td>Nada é publicado</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO OUTBOX</h3><div class='check-row'><article><span class='tick'></span><span>Insert na mesma transação.</span></article><article><span class='tick'></span><span>Índice só das pendentes.</span></article><article><span class='tick'></span><span>Publicado só após o ack.</span></article><article><span class='tick'></span><span>Consumidor idempotente pelo id.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>12 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 2 · FLUXO</div>
+      <h1>Do POST até<br>a fatura</h1>
+      <p class="sub">Uma compra aprovada atravessa HTTP, agregado, outbox, log e dois consumidores. Cada seta tem um dono.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Ler o caminho feliz com os nomes certos.</span></li><li><span class='tick'></span><span>Ver o que cada serviço persiste.</span></li><li><span class='tick'></span><span>Ver o que não volta para a autorização.</span></li><li><span class='tick'></span><span>Nomear o ponto em que a compra já é fato.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Caminho</b><em>Sete passos, um fato</em></div></div><ul class='clean'><li><span class='tick'></span><span>1. Terminal chama POST /autorizacoes com a chave de idempotência.</span></li><li><span class='tick'></span><span>2. Controller traduz e chama AutorizarCompra.</span></li><li><span class='tick'></span><span>3. ContaCartao.reservar altera reservado e cria LimiteReservado.</span></li><li><span class='tick'></span><span>4. A transação grava a conta e a linha do outbox.</span></li><li><span class='tick'></span><span>5. O publicador entrega o fato no tópico cartao.limite.reservado.</span></li><li><span class='tick'></span><span>6. Postagem guarda a reserva para casar com o clearing.</span></li><li><span class='tick'></span><span>7. Fraude lê o mesmo fato. Nenhum dos dois escreve na tabela da autorização.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>2</span><div><b>Dono de cada dado</b><em>Um escritor por esquema</em></div></div><ul class='clean'><li><span class='tick'></span><span>Autorização escreve concedido, reservado, postado e outbox.</span></li><li><span class='tick'></span><span>Postagem escreve a transação confirmada e o valor que vai a faturar.</span></li><li><span class='tick'></span><span>Fatura escreve ciclo, linha de fatura, rotativo e pagamento.</span></li><li><span class='tick'></span><span>Leitura cruzada é API ou evento, nunca JOIN entre bancos.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>3</span><div><b>Quando a compra já valeu</b><em>O commit da reserva</em></div></div><div class='body'><p>Antes do commit, uma falha desfaz tudo e o terminal pode repetir. Depois do commit, a recusa não existe mais: o caminho é estorno ou expiração da reserva se o clearing não chegar no prazo. Expirar reserva é outro caso de uso, com outro evento, LimiteLiberado.</p></div></article></div><div class='sol'><div class='sol-h'><b>EVENTO</b><span class='hint'>Nome no passado, carga mínima</span></div><table><thead><tr><th>Evento</th><th>Quem publica</th><th>Quem consome</th></tr></thead><tbody><tr><td>LimiteReservado</td><td>Autorização</td><td>Postagem e fraude</td></tr><tr><td>TransacaoPostada</td><td>Postagem</td><td>Fatura e autorização</td></tr><tr><td>FaturaFechada</td><td>Fatura</td><td>Cobrança e notificação</td></tr><tr><td>LimiteLiberado</td><td>Autorização</td><td>Postagem</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO FLUXO</h3><div class='check-row'><article><span class='tick'></span><span>Um escritor por tabela.</span></article><article><span class='tick'></span><span>Fato só depois do commit.</span></article><article><span class='tick'></span><span>Consumidor não devolve comando.</span></article><article><span class='tick'></span><span>Expiração tem evento próprio.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>13 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 3 · ESTRATÉGIA</div>
+      <h1>Pirâmide e gestão<br>da qualidade</h1>
+      <p class="sub">A pirâmide coloca a maior parte da prova em teste rápido e deixa o teste de ponta a ponta curto. Gestão de qualidade é o risco coberto, não a quantidade de casos.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Distribuir unitário, integração, contrato e ponta a ponta.</span></li><li><span class='tick'></span><span>Escolher a ferramenta Java de cada camada.</span></li><li><span class='tick'></span><span>Tratar web e mobile sem duplicar a regra.</span></li><li><span class='tick'></span><span>Decidir o release pelo buraco, não pelo percentual solto.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Camadas</b><em>Quanto sobe, mais lento e mais frágil</em></div></div><ul class='clean'><li><span class='tick'></span><span>Unitário: agregado e caso de uso. JUnit 5 e AssertJ. Milhares, segundos.</span></li><li><span class='tick'></span><span>Integração: JDBC, outbox, SQS. Testcontainers. Dezenas, minutos.</span></li><li><span class='tick'></span><span>Contrato: o JSON que o consumidor espera. Pact JVM ou Spring Cloud Contract. Sem Node.</span></li><li><span class='tick'></span><span>Ponta a ponta: uma compra de verdade num ambiente. Poucos. Selenium ou o canal do app.</span></li><li><span class='tick'></span><span>Estático: SpotBugs, Error Prone, checagem de migração SQL no pipeline.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Web, backend e app</b><em>A regra mora uma vez</em></div></div><div class='body'><p>O cálculo do disponível não é retestado na UI com cinquenta combinações. A UI prova que o botão mostra a recusa que a API já devolveu. O app prova o mesmo contrato, mais offline e permissão. O backend prova a fórmula. Shift-left é trazer essa prova para o refinamento e o PR, não deixar a descoberta para a véspera do go-live.</p></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Gestão do ciclo</b><em>Risco nomeado</em></div></div><ul class='clean'><li><span class='tick'></span><span>Cada história nasce com os exemplos BMAD e o nível da pirâmide que os cobre.</span></li><li><span class='tick'></span><span>Defeito de produção vira teste no nível em que a falha podia ter sido vista.</span></li><li><span class='tick'></span><span>Quality gate do PR: teste, mutação mínima do pacote alterado e sem segredo no diff.</span></li><li><span class='tick'></span><span>Release: SLO da autorização estável, migração ensaiada, rollback escrito.</span></li></ul></article></div><div class='sol'><div class='sol-h'><b>ONDE PROVAR</b><span class='hint'>Não suba de camada sem necessidade</span></div><table><thead><tr><th>Afirmação</th><th>Camada</th><th>Ferramenta</th></tr></thead><tbody><tr><td>900 recusa quando disponível é 800</td><td>Unitário</td><td>JUnit</td></tr><tr><td>A coluna reservado mudou</td><td>Integração</td><td>Testcontainers</td></tr><tr><td>O JSON tem o campo recibo</td><td>Contrato</td><td>Pact JVM</td></tr><tr><td>O caixa vê a recusa</td><td>Ponta a ponta</td><td>Um cenário</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA ESTRATÉGIA</h3><div class='check-row'><article><span class='tick'></span><span>Fórmula tem teste unitário.</span></article><article><span class='tick'></span><span>Persistência tem integração.</span></article><article><span class='tick'></span><span>Contrato cobre a recusa.</span></article><article><span class='tick'></span><span>E2E não repete a tabela verdade.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>14 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 3 · PERFORMANCE</div>
+      <h1>k6 e JMeter<br>com uma conta</h1>
+      <p class="sub">Teste de carga mede o caminho. Teste de stress passa do limite de propósito. Uma conta de teste só serve se o cenário não depender de saldo compartilhado.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Escrever um script k6 com limiar.</span></li><li><span class='tick'></span><span>Isolar a conta única com chave e valor pequeno.</span></li><li><span class='tick'></span><span>Rodar JMeter sem a interface gráfica.</span></li><li><span class='tick'></span><span>Separar metrica do gerador e metrica do serviço.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>k6</b><em>Limiar que falha o pipeline</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>carga.js</div><pre>import http from &#x27;k6/http&#x27;;
+import { check } from &#x27;k6&#x27;;
+export const options = {
+  vus: 30,
+  duration: &#x27;2m&#x27;,
+  thresholds: {
+    http_req_failed: [&#x27;rate&lt;0.01&#x27;],
+    http_req_duration: [&#x27;p(95)&lt;300&#x27;],
+  },
+};
+export default function () {
+  const res = http.post(__ENV.BASE_URL + &#x27;/autorizacoes&#x27;,
+    JSON.stringify({ conta: __ENV.CONTA, valor: &#x27;1.00&#x27;,
+      moeda: &#x27;BRL&#x27;, chave: __VU + &#x27;-&#x27; + __ITER }),
+    { headers: { &#x27;Content-Type&#x27;: &#x27;application/json&#x27; } });
+  check(res, { &#x27;contrato&#x27;: r =&gt; r.status === 201 || r.status === 422 });
+}</pre></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Uma conta só</b><em>Não dispute o mesmo saldo</em></div></div><ul class='clean'><li><span class='tick'></span><span>Cenário de leitura, GET do disponível, pode usar a conta à vontade.</span></li><li><span class='tick'></span><span>Cenário de escrita usa valor 1.00 e chave VU-ITER. A idempotência evita reserva dupla do mesmo iter.</span></li><li><span class='tick'></span><span>O limite da conta de laboratório é alto o bastante para o teste, ou o teste aceita 422 como contrato válido.</span></li><li><span class='tick'></span><span>Não afirme o saldo final: trinta VUs em paralelo não têm um saldo determinístico.</span></li><li><span class='tick'></span><span>Limpeza é um job depois, não um DELETE no meio da medição.</span></li><li><span class='tick'></span><span>Se precisar de saldo exato, use uma conta por VU criada na setup. Uma conta só não dá essa garantia.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>JMeter em linha de comando</b><em>GUI só desenha o plano</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>jmeter.sh</div><pre>jmeter -n -t autorizacao.jmx -l resultado.jtl \
+  -JbaseUrl=https://lab.exemplo -Jconta=conta-lab \
+  -Jusuarios=30 -Jduracao=120</pre></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Como ler</b><em>O gerador também satura</em></div></div><div class='body'><p>p95 alto com CPU do serviço baixa pode ser o gerador ou a rede. Olhe saturação dos dois lados. Stress é subir VUs até o erro aparecer e anotar o ponto. Soak é segurar a carga moderada por horas para achar vazamento de pool. Os dois usam o mesmo script. Muda o perfil, não a regra de negócio.</p></div></article></div><div class='sol'><div class='sol-h'><b>PERFIL</b><span class='hint'>Um script, três perguntas</span></div><table><thead><tr><th>Perfil</th><th>Forma</th><th>Pergunta</th></tr></thead><tbody><tr><td>Carga</td><td>VUs previstos, p95</td><td>Aguenta o pico do dia?</td></tr><tr><td>Stress</td><td>Sobe até quebrar</td><td>Onde e como quebra?</td></tr><tr><td>Soak</td><td>Carga média, horas</td><td>Pool ou memória escorre?</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA CARGA</h3><div class='check-row'><article><span class='tick'></span><span>Limiar de erro e p95.</span></article><article><span class='tick'></span><span>Chave por iteração.</span></article><article><span class='tick'></span><span>422 conta como contrato.</span></article><article><span class='tick'></span><span>Métrica do serviço junto.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>15 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 3 · MUTAÇÃO</div>
+      <h1>Pitest olha<br>o teste, não a linha</h1>
+      <p class="sub">Cobertura diz que a linha rodou. Mutação muda o código e exige que o teste falhe. Se o teste continua verde, a suíte não segurou a regra.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Entender o que é um mutante.</span></li><li><span class='tick'></span><span>Ver um mutante clássico do limite.</span></li><li><span class='tick'></span><span>Configurar o Pitest no Maven.</span></li><li><span class='tick'></span><span>Não perseguir 100 por cento cego.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Por dentro</b><em>Matar o mutante</em></div></div><div class='body'><p>O Pitest copia uma classe, aplica um operador e roda os testes que cobrem essa classe. Operador de condição troca maiorQue por maiorOuIgual. Se o teste de limite 800 contra compra 800 não existe, os dois comportamentos passam e o mutante sobrevive. Mutante morto significa que algum teste ficou vermelho. Mutante sobrevivente é buraco. Timeout e mutante equivalente são inconclusivos, não vitória.</p></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>O mutante que importa</b><em>A fronteira do disponível</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>mutante.java</div><pre>// original
+if (valor.maiorQue(disponivel)) throw new LimiteInsuficiente(...);
+// mutante: condição invertida ou trocada por &gt;=
+if (!valor.maiorQue(disponivel)) throw new LimiteInsuficiente(...);
+// o teste que mata: compra == disponivel aprova
+// e compra == disponivel + 0.01 recusa</pre></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Maven</b><em>Portão no pacote que mudou</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>pom.xml</div><pre>&lt;plugin&gt;
+  &lt;groupId&gt;org.pitest&lt;/groupId&gt;
+  &lt;artifactId&gt;pitest-maven&lt;/artifactId&gt;
+  &lt;version&gt;1.17.4&lt;/version&gt;
+  &lt;configuration&gt;
+    &lt;targetClasses&gt;&lt;param&gt;com.exemplo.limite.*&lt;/param&gt;&lt;/targetClasses&gt;
+    &lt;targetTests&gt;&lt;param&gt;com.exemplo.limite.*&lt;/param&gt;&lt;/targetTests&gt;
+    &lt;mutationThreshold&gt;75&lt;/mutationThreshold&gt;
+  &lt;/configuration&gt;
+&lt;/plugin&gt;
+./mvnw -B pitest:mutationCoverage</pre></div></article></div><div class='sol'><div class='sol-h'><b>RESULTADO DO PITEST</b><span class='hint'>Aja no sobrevivente de regra</span></div><table><thead><tr><th>Estado</th><th>Significado</th><th>Ação</th></tr></thead><tbody><tr><td>Killed</td><td>Um teste ficou vermelho</td><td>Siga</td></tr><tr><td>Survived</td><td>Nenhum teste percebeu</td><td>Teste na fronteira</td></tr><tr><td>No coverage</td><td>Nenhum teste executou</td><td>Teste ou código morto</td></tr><tr><td>Timed out</td><td>O mutante não terminou</td><td>Olhe laço e mock</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA MUTAÇÃO</h3><div class='check-row'><article><span class='tick'></span><span>Fronteira igual ao limite testada.</span></article><article><span class='tick'></span><span>Limiar no pacote de domínio.</span></article><article><span class='tick'></span><span>Sobrevivente vira teste.</span></article><article><span class='tick'></span><span>Não mutar DTO sem regra.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>16 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 3 · INTEGRAÇÃO</div>
+      <h1>Testcontainers<br>sem Node</h1>
+      <p class="sub">Testcontainers sobe Postgres e LocalStack no Docker para o teste JUnit. O teste prova SQL e fila de verdade e acaba quando a JVM acaba.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Subir PostgreSQL 16 no teste.</span></li><li><span class='tick'></span><span>Gravar reserva e linha de outbox.</span></li><li><span class='tick'></span><span>Subir SQS no LocalStack.</span></li><li><span class='tick'></span><span>Manter o teste independente da ordem.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Postgres</b><em>Esquema real, dado do teste</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>ReservaIT.java</div><pre>@Testcontainers
+class ReservaIT {
+  @Container
+  static PostgreSQLContainer&lt;?&gt; pg =
+      new PostgreSQLContainer&lt;&gt;(&quot;postgres:16-alpine&quot;);
+  @Test
+  void gravaReservaEOutbox() {
+    Executar.jdbc(pg).executar(pedidoDe(&quot;40.00&quot;));
+    long pendentes = contar(pg,
+      &quot;select count(*) from outbox where publicado_em is null&quot;);
+    assertThat(pendentes).isEqualTo(1);
+  }
+}</pre></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>SQS local</b><em>AWS de mentira, SDK de verdade</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>FilaIT.java</div><pre>@Container
+static LocalStackContainer localstack =
+    new LocalStackContainer(DockerImageName.parse(&quot;localstack/localstack:3.8&quot;))
+        .withServices(Service.SQS);
+SqsClient cliente = SqsClient.builder()
+    .endpointOverride(localstack.getEndpoint())
+    .credentialsProvider(StaticCredentialsProvider.create(
+        AwsBasicCredentials.create(localstack.getAccessKey(), localstack.getSecretKey())))
+    .region(Region.of(localstack.getRegion()))
+    .build();</pre></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Higiene</b><em>O teste não herda sujeira</em></div></div><ul class='clean'><li><span class='tick'></span><span>Cada teste cria a conta que usa, com id aleatório.</span></li><li><span class='tick'></span><span>Não há conta fixa compartilhada com o teste de carga.</span></li><li><span class='tick'></span><span>A asserção olha a linha pelo id do teste, não count(*) da tabela inteira, se outros testes dividem o container.</span></li><li><span class='tick'></span><span>O container é estático na classe para não pagar o boot a cada método. A transação do teste desfaz o que puder.</span></li><li><span class='tick'></span><span>CI precisa de Docker. Sem Docker o teste de integração não finge que passou.</span></li></ul></article></div><div class='sol'><div class='sol-h'><b>O QUE ESTE TESTE NÃO FAZ</b><span class='hint'>Integração não é carga nem UI</span></div><table><thead><tr><th>Fora de escopo</th><th>Onde prova</th><th>Por quê</th></tr></thead><tbody><tr><td>30 usuários paralelos</td><td>k6</td><td>Container local não é o ambiente</td></tr><tr><td>Pixel do app</td><td>E2E do canal</td><td>Aqui não há tela</td></tr><tr><td>Mutante da fórmula</td><td>Pitest</td><td>A fórmula já tem teste unitário</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA INTEGRAÇÃO</h3><div class='check-row'><article><span class='tick'></span><span>Imagem com versão fixa.</span></article><article><span class='tick'></span><span>Dado criado pelo teste.</span></article><article><span class='tick'></span><span>Outbox e reserva juntos.</span></article><article><span class='tick'></span><span>CI tem Docker.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>17 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 4 · POSTGRESQL</div>
+      <h1>Tabela, regra<br>e partição</h1>
+      <p class="sub">O banco guarda o invariante que o aplicativo também guarda. Constraint não substitui o agregado. Impede a linha impossível que escapou de um caminho.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Criar a conta com tipos e checks.</span></li><li><span class='tick'></span><span>Impedir disponível negativo por coluna gerada ou check.</span></li><li><span class='tick'></span><span>Particionar transação por tempo.</span></li><li><span class='tick'></span><span>Migrar com script versionado.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Conta</b><em>Dinheiro em centavos inteiros</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>V001__conta.sql</div><pre>CREATE TABLE conta (
+  id uuid PRIMARY KEY,
+  concedido_centavos bigint NOT NULL CHECK (concedido_centavos &gt;= 0),
+  reservado_centavos bigint NOT NULL CHECK (reservado_centavos &gt;= 0),
+  postado_centavos bigint NOT NULL CHECK (postado_centavos &gt;= 0),
+  CHECK (reservado_centavos + postado_centavos &lt;= concedido_centavos),
+  versao bigint NOT NULL DEFAULT 0
+);</pre></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Por que centavos</b><em>Numeric é válido. Inteiro evita surpresa</em></div></div><div class='body'><p>numeric(15,2) também serve e documenta a escala. Inteiro em centavos evita uma parte dos arredondamentos no meio do Java. Os dois são aceitáveis se a escolha for uma só, da borda até a fatura. Misturar double é defeito: 0.1 não é exato em binário. O check da soma impede uma reserva que o código esqueceu de validar.</p></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Partição da transação</b><em>Corte por mês</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>V002__transacao.sql</div><pre>CREATE TABLE transacao (
+  id bigint NOT NULL,
+  conta_id uuid NOT NULL,
+  centavos bigint NOT NULL CHECK (centavos &lt;&gt; 0),
+  ocorrida_em timestamptz NOT NULL,
+  PRIMARY KEY (id, ocorrida_em)
+) PARTITION BY RANGE (ocorrida_em);
+
+CREATE TABLE transacao_2026_11 PARTITION OF transacao
+  FOR VALUES FROM (&#x27;2026-11-01&#x27;) TO (&#x27;2026-12-01&#x27;);</pre></div></article></div><div class='sol'><div class='sol-h'><b>CONSTRAINT</b><span class='hint'>O banco recusa a linha</span></div><table><thead><tr><th>Regra</th><th>Mecanismo</th><th>Erro se violar</th></tr></thead><tbody><tr><td>Id único</td><td>PRIMARY KEY</td><td>Chave duplicada</td></tr><tr><td>Valor presente</td><td>NOT NULL</td><td>Nulo</td></tr><tr><td>Soma dentro do limite</td><td>CHECK</td><td>Check violation</td></tr><tr><td>Mês certo</td><td>PARTITION</td><td>Nenhuma partição</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO ESQUEMA</h3><div class='check-row'><article><span class='tick'></span><span>Sem double para dinheiro.</span></article><article><span class='tick'></span><span>Check do limite na tabela.</span></article><article><span class='tick'></span><span>Partição inclui a chave.</span></article><article><span class='tick'></span><span>Script tem versão.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>18 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 4 · ÍNDICES</div>
+      <h1>B-Tree, GIN<br>e o plano</h1>
+      <p class="sub">Índice acelera leitura e encarece escrita. EXPLAIN ANALYZE executa a consulta e mostra o custo real. EXPLAIN sem ANALYZE só estima.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Escolher B-Tree para igualdade e faixa.</span></li><li><span class='tick'></span><span>Escolher GIN para jsonb e lista.</span></li><li><span class='tick'></span><span>Saber quando não criar índice.</span></li><li><span class='tick'></span><span>Ler Seq Scan versus Index Scan no plano.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Tipos</b><em>O acesso manda no tipo</em></div></div><ul class='clean'><li><span class='tick'></span><span>B-Tree é o padrão. Serve =, &lt;, &gt;, BETWEEN e ORDER BY alinhado.</span></li><li><span class='tick'></span><span>GIN, Generalized Inverted Index, serve jsonb, array e busca de termos. A escrita é mais cara.</span></li><li><span class='tick'></span><span>Hash só faz igualdade. Desde o PostgreSQL 10 ele tem WAL, mas quase nunca ganha de um B-Tree. Não é a primeira escolha.</span></li><li><span class='tick'></span><span>Índice parcial, com WHERE, cabe nas linhas do outbox ainda não publicadas.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Quando não criar</b><em>Índice ocioso também é custo</em></div></div><ul class='clean'><li><span class='tick'></span><span>Coluna boolean sozinha, com metade da tabela em cada lado. O planejador prefere ler a tabela.</span></li><li><span class='tick'></span><span>Tabela pequena que cabe em poucas páginas.</span></li><li><span class='tick'></span><span>Coluna que muda o tempo todo e nenhuma consulta filtra por ela.</span></li><li><span class='tick'></span><span>Índice duplicado da chave primária.</span></li><li><span class='tick'></span><span>Ordem das colunas invertida: (ocorrida_em, conta_id) não atende WHERE conta_id = ? sozinho com a mesma força de (conta_id, ocorrida_em).</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Plano</b><em>Olhe linhas de verdade e buffers</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>plano.sql</div><pre>EXPLAIN (ANALYZE, BUFFERS)
+SELECT id, centavos
+FROM transacao
+WHERE conta_id = &#x27;6b1e2a7c-1d24-4a3e-9f0a-0c2d9a1b77e2&#x27;
+  AND ocorrida_em &gt;= now() - interval &#x27;30 days&#x27;;
+-- Index Scan usando (conta_id, ocorrida_em): caminho esperado
+-- Seq Scan com milhões de linhas: falta índice ou a estatística está velha
+ANALYZE transacao;</pre></div></article></div><div class='sol'><div class='sol-h'><b>SINTOMA NO PLANO</b><span class='hint'>Uma causa comum</span></div><table><thead><tr><th>O que você vê</th><th>Causa comum</th><th>Ação</th></tr></thead><tbody><tr><td>Seq Scan na tabela grande</td><td>Filtro sem índice útil</td><td>Índice na ordem do WHERE</td></tr><tr><td>Index Scan e mesmo assim lento</td><td>Volta muita linha à tabela</td><td>Índice cobre as colunas do SELECT</td></tr><tr><td>Estimativa 10 e realidade 1 milhão</td><td>Estatística velha</td><td>ANALYZE</td></tr><tr><td>Bitmap na jsonb</td><td>Consulta de containment</td><td>GIN no jsonb</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO ÍNDICE</h3><div class='check-row'><article><span class='tick'></span><span>WHERE dita a ordem das colunas.</span></article><article><span class='tick'></span><span>Parcial no outbox pendente.</span></article><article><span class='tick'></span><span>ANALYZE depois da carga.</span></article><article><span class='tick'></span><span>Índice novo justificado pelo plano.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>19 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 4 · OBSERVABILIDADE</div>
+      <h1>Sinais de ouro,<br>Grafana e New Relic</h1>
+      <p class="sub">Os quatro golden signals são latência, tráfego, erros e saturação. Log explica um caso. Métrica mostra a tendência. Trace atravessa autorização, banco e fila.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Definir os quatro sinais na autorização.</span></li><li><span class='tick'></span><span>Ler um PromQL e um NRQL.</span></li><li><span class='tick'></span><span>Propagar o trace id até a mensagem.</span></li><li><span class='tick'></span><span>Distinguir SLI, SLO e SLA com número.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Os quatro sinais</b><em>Painel mínimo do serviço</em></div></div><ul class='clean'><li><span class='tick'></span><span>Latência: p95 do POST /autorizacoes. Meta de estudo: abaixo de 300 ms.</span></li><li><span class='tick'></span><span>Tráfego: requisições por segundo, separadas por aprovado e recusado.</span></li><li><span class='tick'></span><span>Erros: taxa de HTTP 5xx. 422 é negócio, não erro de plataforma.</span></li><li><span class='tick'></span><span>Saturação: pool de conexões, CPU, lag do consumidor e fila do outbox pendente.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Consultas</b><em>Grafana lê Prometheus. New Relic lê NRQL</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>sinais.txt</div><pre># PromQL, p95 em 5 minutos
+histogram_quantile(0.95,
+  sum by (le) (rate(http_server_requests_seconds_bucket{
+    uri=&quot;/autorizacoes&quot;}[5m])))
+
+-- NRQL
+SELECT percentile(duration, 95)
+FROM Transaction
+WHERE name = &#x27;POST /autorizacoes&#x27;
+SINCE 1 hour ago</pre></div></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Trace distribuído</b><em>Um id atravessa o fato</em></div></div><div class='body'><p>O adaptador HTTP abre o span. O JDBC e o publicador do outbox são spans filhos. O trace id vai no cabeçalho da mensagem. O consumidor da fatura continua o trace. Sem isso, o p95 alto não diz se o tempo está no banco, no Kafka ou na regra. Log sem esse id obriga a cruzar horário na mão.</p></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>SLI, SLO, SLA</b><em>Medida, meta e contrato</em></div></div><div class='body'><p>SLI, Service Level Indicator, é a medida: porcentagem de autorizações com HTTP diferente de 5xx e p95 dentro do prazo, numa janela de 30 dias. SLO, Service Level Objective, é a meta interna: 99,9 por cento. SLA, Service Level Agreement, é o contrato com consequência se a meta externa quebrar. Alerta queima o orçamento de erro do SLO, não o susto de um minuto isolado.</p></div></article></div><div class='sol'><div class='sol-h'><b>ONDE OLHAR PRIMEIRO</b><span class='hint'>Sinal, depois log</span></div><table><thead><tr><th>Sintoma</th><th>Sinal</th><th>Próximo passo</th></tr></thead><tbody><tr><td>Compra lenta</td><td>Latência p95</td><td>Trace do p95, não a média</td></tr><tr><td>Fila crescendo</td><td>Saturação / lag</td><td>Consumidor e visibility timeout</td></tr><tr><td>Cliente vê falha</td><td>Erros 5xx</td><td>Log com o trace id</td></tr><tr><td>Recusa subiu</td><td>Tráfego por código</td><td>Regra de negócio, não saturação</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO PAINEL</h3><div class='check-row'><article><span class='tick'></span><span>422 fora da taxa de erro.</span></article><article><span class='tick'></span><span>p95 com trace.</span></article><article><span class='tick'></span><span>Lag da fila no painel.</span></article><article><span class='tick'></span><span>SLO escrito com janela.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>20 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 5 · MAINFRAME</div>
+      <h1>COBOL, VSAM,<br>copybook e JCL</h1>
+      <p class="sub">O legado de cartão ainda decide limite em batch e em programa online. Ler o layout é a primeira ferramenta da migração.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Ler as divisões de um programa COBOL curto.</span></li><li><span class='tick'></span><span>Entender VSAM KSDS como arquivo indexado.</span></li><li><span class='tick'></span><span>Ver um copybook de saldo.</span></li><li><span class='tick'></span><span>Ler um JCL que executa o programa.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Programa</b><em>A regra cabe no PROCEDURE</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>AUTORIZA.cbl</div><pre>IDENTIFICATION DIVISION.
+PROGRAM-ID. AUTORIZA.
+DATA DIVISION.
+WORKING-STORAGE SECTION.
+01 WS-DISPONIVEL PIC S9(9)V99 COMP-3.
+PROCEDURE DIVISION.
+    COMPUTE WS-DISPONIVEL = WS-LIMITE - WS-RESERVADO - WS-POSTADO
+    IF WS-VALOR &gt; WS-DISPONIVEL
+        MOVE &#x27;51&#x27; TO WS-RESPOSTA
+    ELSE
+        ADD WS-VALOR TO WS-RESERVADO
+        MOVE &#x27;00&#x27; TO WS-RESPOSTA
+    END-IF.
+    STOP RUN.</pre></div></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Peças</b><em>O que cada nome é</em></div></div><ul class='clean'><li><span class='tick'></span><span>IDENTIFICATION, ENVIRONMENT, DATA e PROCEDURE são as quatro divisões clássicas.</span></li><li><span class='tick'></span><span>PIC descreve o campo. S9(9)V99 é sinal, nove dígitos e duas casas. COMP-3 é decimal compactado.</span></li><li><span class='tick'></span><span>COPY inclui um copybook, o layout compartilhado. Mudar o copybook muda todo programa que o copia.</span></li><li><span class='tick'></span><span>VSAM KSDS, Key-Sequenced Data Set, é arquivo indexado pela chave. A conta é a chave. Não é uma tabela SQL, mas o acesso por chave se parece com um índice.</span></li><li><span class='tick'></span><span>JCL, Job Control Language, não é a regra. É o script que aloca arquivo e chama o programa.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Copybook</b><em>O contrato binário do legado</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>SALDO.cpy</div><pre>01 SALDO-CONTA.
+   05 CONTA-ID        PIC X(16).
+   05 LIMITE          PIC S9(9)V99 COMP-3.
+   05 RESERVADO       PIC S9(9)V99 COMP-3.
+   05 POSTADO         PIC S9(9)V99 COMP-3.</pre></div></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>JCL</b><em>Job, step, programa, arquivo</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>AUTORIZ.jcl</div><pre>//AUTORIZ JOB (ACCT),&#x27;CARTAO&#x27;,CLASS=A,MSGCLASS=X
+//STEP1   EXEC PGM=AUTORIZA
+//STEPLIB DD DSN=CARTAO.LOADLIB,DISP=SHR
+//CONTAS  DD DSN=CARTAO.CONTAS.KSDS,DISP=SHR</pre></div></article></div><div class='sol'><div class='sol-h'><b>TRADUÇÃO DE LEITURA</b><span class='hint'>Não reescreva antes de nomear</span></div><table><thead><tr><th>Legado</th><th>No Java deste livro</th><th>Cuidado</th></tr></thead><tbody><tr><td>COPYBOOK</td><td>DTO de borda e teste de layout</td><td>Campo packed muda o byte</td></tr><tr><td>KSDS por conta</td><td>Tabela conta com PK</td><td>A chave pode ter preenchimento</td></tr><tr><td>JOB noturno</td><td>Worker com outbox</td><td>Horário de corte é regra</td></tr><tr><td>Código 51</td><td>422 limite insuficiente</td><td>00 e 51 são ISO 8583</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO LEGADO</h3><div class='check-row'><article><span class='tick'></span><span>Copybook versionado.</span></article><article><span class='tick'></span><span>PIC entendido em centavos.</span></article><article><span class='tick'></span><span>JCL lido até o DD.</span></article><article><span class='tick'></span><span>Código 51 mapeado.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>21 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 5 · VISION PLUS</div>
+      <h1>Núcleo de cartão:<br>autorizar e faturar</h1>
+      <p class="sub">Vision Plus é um núcleo de cartão usado em muitos emissores. Os nomes abaixo são o mapa de estudo usado em modernização. Não são o manual interno do fabricante.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Situar CMS, FAS, TRAMS, ITS e CTA no fluxo.</span></li><li><span class='tick'></span><span>Separar autorização online de postagem e fatura.</span></li><li><span class='tick'></span><span>Ver onde nascem limite, juros e transação.</span></li><li><span class='tick'></span><span>Saber o que o Java novo precisa substituir primeiro.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Mapa de estudo</b><em>Cinco nomes, cinco responsabilidades usuais</em></div></div><ul class='clean'><li><span class='tick'></span><span>CMS, gestão de cartão e conta: plástico, produto, limite concedido e status.</span></li><li><span class='tick'></span><span>FAS, autorização financeira: responde a compra em tempo real com o código 00 ou 51.</span></li><li><span class='tick'></span><span>TRAMS, transações monetárias: posta o clearing, estorno e ajuste no saldo.</span></li><li><span class='tick'></span><span>ITS, borda de intercâmbio: fala com a bandeira e traduz a mensagem.</span></li><li><span class='tick'></span><span>CTA, conta e movimento do titular: base que fatura e cobrança consultam no fim do ciclo.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Ordem do dinheiro</b><em>Cada etapa tem horário</em></div></div><div class='body'><p>A compra passa no ITS, o FAS reserva no limite do CMS e responde. Horas ou dias depois o clearing chega, o TRAMS posta e a reserva sai. No corte, o CTA fecha a fatura. O que não foi pago vira rotativo: saldo vezes a taxa do período, mais tributo vigente. Juros não são calculados na autorização do caixa.</p></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>O que dói na migração</b><em>Estado espalhado</em></div></div><ul class='clean'><li><span class='tick'></span><span>O limite concedido mora no CMS e o reservado pode estar no FAS. Os dois precisam de uma fórmula só.</span></li><li><span class='tick'></span><span>O batch noturno do TRAMS e o online do FAS alteram saldo. A ordem entre eles é regra.</span></li><li><span class='tick'></span><span>Copybook da mensagem de autorização é o contrato com a bandeira. Mudou o byte, mudou o emissor.</span></li><li><span class='tick'></span><span>O primeiro corte útil costuma ser a leitura: um serviço Java responde disponível enquanto o legado ainda grava. Escrever nos dois ao mesmo tempo, sem dono, recria o dual write.</span></li></ul></article></div><div class='sol'><div class='sol-h'><b>PERGUNTA DE NEGÓCIO</b><span class='hint'>Qual módulo de estudo responde</span></div><table><thead><tr><th>Pergunta</th><th>Módulo de estudo</th><th>Dado</th></tr></thead><tbody><tr><td>Qual é o limite do produto?</td><td>CMS</td><td>Concedido</td></tr><tr><td>A compra de agora passa?</td><td>FAS</td><td>Disponível e código</td></tr><tr><td>O clearing entrou?</td><td>TRAMS</td><td>Postado e reserva liberada</td></tr><tr><td>Quanto é a fatura?</td><td>CTA</td><td>Ciclo, rotativo, tributo</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO MAPA</h3><div class='check-row'><article><span class='tick'></span><span>Fórmula única de disponível.</span></article><article><span class='tick'></span><span>Corte do batch escrito.</span></article><article><span class='tick'></span><span>Copybook da bandeira isolado.</span></article><article><span class='tick'></span><span>Juros fora da autorização.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>22 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 5 · MIGRAÇÃO</div>
+      <h1>Strangler Fig<br>e anticorrupção</h1>
+      <p class="sub">Strangler Fig substitui o legado por fora, um fluxo de cada vez, até o programa antigo perder o tráfego. ACL, Anti-Corruption Layer, impede o copybook de virar o modelo Java.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Cortar a autorização primeiro, com o legado ainda dono do resto.</span></li><li><span class='tick'></span><span>Traduzir copybook na ACL, não no agregado.</span></li><li><span class='tick'></span><span>Sincronizar limite sem dual write eterno.</span></li><li><span class='tick'></span><span>Definir o dia em que o FAS deixa de decidir.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Figueira estranguladora</b><em>Uma rota por vez</em></div></div><ul class='clean'><li><span class='tick'></span><span>Uma fachada recebe a mensagem da bandeira.</span></li><li><span class='tick'></span><span>A rota de autorização de compra nacional vai para o Java.</span></li><li><span class='tick'></span><span>Internacional, ajuste e estorno continuam no FAS até terem exemplos.</span></li><li><span class='tick'></span><span>A fachada é o único lugar que conhece os dois mundos.</span></li><li><span class='tick'></span><span>Quando a rota antiga fica sem tráfego, o programa COBOL correspondente sai.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>ACL</b><em>Byte do legado não entra no domínio</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>AclAutorizacao.java</div><pre>public final class AclAutorizacao {
+    public Pedido traduzir(byte[] iso) {
+        String conta = ebcdic(iso, 0, 16).trim();
+        long centavos = packed(iso, 16, 6);
+        return new Pedido(ContaId.de(conta), Dinheiro.centavos(centavos));
+    }
+    public byte[] responder(Recibo recibo) {
+        return recibo.aprovado() ? codigo(&quot;00&quot;) : codigo(&quot;51&quot;);
+    }
+}</pre></div></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Dados no meio do caminho</b><em>Aurora PostgreSQL é o destino, não o atalho</em></div></div><div class='body'><p>Enquanto o CMS ainda altera o concedido, um fluxo de mudança copia o concedido para a conta Java. A autorização nova é dona só do reservado que ela mesma criou. Postagem continua no TRAMS e devolve TransacaoPostada. Quando fatura e postagem também migram, o legado deixa de escrever. Aurora PostgreSQL recebe o esquema do módulo 4. O outbox publica para quem ainda escuta. Não há período infinito em que os dois lados reservam a mesma compra.</p></div></article></div><div class='sol'><div class='sol-h'><b>FASE</b><span class='hint'>Dono da reserva</span></div><table><thead><tr><th>Fase</th><th>Quem reserva</th><th>Legado</th></tr></thead><tbody><tr><td>0</td><td>FAS</td><td>Tudo</td></tr><tr><td>1</td><td>Java na compra nacional</td><td>Resto e concedido</td></tr><tr><td>2</td><td>Java também na postagem</td><td>Fatura e produto</td></tr><tr><td>3</td><td>Java</td><td>Somente leitura até desligar</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DA MIGRAÇÃO</h3><div class='check-row'><article><span class='tick'></span><span>Uma rota por vez.</span></article><article><span class='tick'></span><span>ACL sem regra de limite.</span></article><article><span class='tick'></span><span>Um dono da reserva.</span></article><article><span class='tick'></span><span>Plano de voltar a rota.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>23 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 6 · GLOSSÁRIO</div>
+      <h1>IA e gestão,<br>sem frase solta</h1>
+      <p class="sub">Jargão só ajuda se a frase seguinte disser o que fazer. Esta página fixa o sentido usado no restante da bíblia.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Explicar LLM, token, contexto, prompt, RAG, fine-tuning e agente.</span></li><li><span class='tick'></span><span>Explicar gate, severidade, rollout, SLO e post-mortem.</span></li><li><span class='tick'></span><span>Usar cada termo na autorização de cartão.</span></li><li><span class='tick'></span><span>Não trocar SLA por SLO.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>IA para quem constrói o sistema</b><em>O modelo prevê texto. Não consulta o banco sozinho</em></div></div><ul class='clean'><li><span class='tick'></span><span>LLM, Large Language Model: modelo que continua texto. Não é uma base de regras do limite.</span></li><li><span class='tick'></span><span>Token: pedaço de texto que o modelo conta. Um copybook grande gasta a janela.</span></li><li><span class='tick'></span><span>Context window: o quanto cabe numa conversa. O que ficou de fora não foi lido.</span></li><li><span class='tick'></span><span>Prompt: a instrução e o contexto que você entrega. Exemplo e restrição mudam a resposta.</span></li><li><span class='tick'></span><span>RAG, Retrieval-Augmented Generation: buscar um trecho seu, como o ADR, e só então pedir a resposta.</span></li><li><span class='tick'></span><span>Fine-tuning: treinar o modelo com dados seus. Caro e desnecessário para explicar um PR.</span></li><li><span class='tick'></span><span>Agente: o modelo chama ferramentas em sequência, por exemplo ler o teste e rodar o Maven. A ferramenta é que altera arquivo.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>Gestão técnica</b><em>A palavra muda a fila</em></div></div><ul class='clean'><li><span class='tick'></span><span>Quality gate: portão automático. O merge espera o pipeline.</span></li><li><span class='tick'></span><span>P0: produção quebrada ou dinheiro errado para muitos. P1: degradado com contorno. P2: contido.</span></li><li><span class='tick'></span><span>Rollout: ligar a rota nova aos poucos. Rollback: devolver a rota ao FAS.</span></li><li><span class='tick'></span><span>Go-live: o momento em que a rota passa a valer para compra real.</span></li><li><span class='tick'></span><span>SLI mede, SLO é a meta interna, SLA é o contrato.</span></li><li><span class='tick'></span><span>Post-mortem: relato do incidente sem caça ao culpado, com a ação que vira teste.</span></li><li><span class='tick'></span><span>RFC, Request for Comments: proposta de mudança aberta ao comentário antes do ADR.</span></li><li><span class='tick'></span><span>Tech debt: atalho com juros. Anote o custo, não use a palavra como enfeite.</span></li><li><span class='tick'></span><span>Shift-left: prova e regra cedo, no refinamento e no PR.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Frase pronta neste domínio</b><em>Termo e consequência</em></div></div><div class='body'><p>Um rollout de 5 por cento da autorização nacional tem rollback para o FAS em um comando da fachada. O SLO é 99,9 por cento de respostas sem 5xx em 30 dias. Se o p95 estoura, o post-mortem liga o trace e cria o teste que faltou. Um RFC precede a troca do dono da reserva. Tech debt é a ACL que ainda traduz um copybook que ninguém mais emite.</p></div></article></div><div class='sol'><div class='sol-h'><b>NÃO CONFUNDIR</b><span class='hint'>Pares que o incidente mistura</span></div><table><thead><tr><th>Dito</th><th>Sentido certo</th><th>Não é</th></tr></thead><tbody><tr><td>SLA de 99,9</td><td>Contrato</td><td>Não é o gráfico de ontem</td></tr><tr><td>P0 no backlog</td><td>Produção parada</td><td>Não é história importante</td></tr><tr><td>Fine-tuning</td><td>Treino do modelo</td><td>Não é colar o ADR no chat</td></tr><tr><td>Agente</td><td>Modelo com ferramenta</td><td>Não é um dev a mais sem revisão</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO TERMO</h3><div class='check-row'><article><span class='tick'></span><span>SLO tem número e janela.</span></article><article><span class='tick'></span><span>P0 tem dono agora.</span></article><article><span class='tick'></span><span>RFC antes do corte grande.</span></article><article><span class='tick'></span><span>RAG cita o documento.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>24 / 25</span></div>
+</section>
+<section class="page">
+  <div class="top">
+    <div>
+      <div class="kicker">MÓDULO 6 · PRÁTICA</div>
+      <h1>IA no dia de Dev,<br>QA e Tech Lead</h1>
+      <p class="sub">A IA acelera rascunho, explicação e teste. Quem assina o PR continua responsável pelo invariante do limite e pelo segredo que não pode ir no prompt.</p>
+    </div>
+    <aside class='learn'><h2>O QUE VOCÊ VAI APRENDER</h2><ul><li><span class='tick'></span><span>Pedir um teste de fronteira com o exemplo BMAD.</span></li><li><span class='tick'></span><span>Pedir explicação de copybook sem colar produção.</span></li><li><span class='tick'></span><span>Revisar o diff como se a IA fosse um par júnior.</span></li><li><span class='tick'></span><span>Recusar prompt que inclui senha, PAN ou token de cliente.</span></li></ul></aside>
+  </div>
+  <div class="corpo"><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>1</span><div><b>Dev</b><em>Rascunho em volta da regra</em></div></div><ul class='clean'><li><span class='tick'></span><span>Cole o agregado e peça testes nas fronteiras: igual ao disponível, um centavo acima, valor zero.</span></li><li><span class='tick'></span><span>Peça a tradução do PIC para um teste de layout, com um exemplo numérico seu.</span></li><li><span class='tick'></span><span>Peça um refator que extraia o adaptador. Leia o diff. Rode ./mvnw -B test.</span></li><li><span class='tick'></span><span>Não peça para a ferramenta ignorar o quality gate.</span></li><li><span class='tick'></span><span>Se o modelo inventar um método do Micronaut, confira na documentação da versão do projeto.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>2</span><div><b>QA</b><em>Exemplo e buraco</em></div></div><ul class='clean'><li><span class='tick'></span><span>Entregue a regra numerada e peça os casos de example mapping que faltam.</span></li><li><span class='tick'></span><span>Peça o script k6 a partir do contrato, com 422 aceito e chave por iteração.</span></li><li><span class='tick'></span><span>Peça para apontar afirmação sem prova no PR. Confira se a afirmação existe mesmo.</span></li><li><span class='tick'></span><span>Dados de produção, PAN e senha não entram no prompt. Use conta fictícia.</span></li></ul></article></div><div class='linha' style='grid-template-columns:1fr 1fr'><article class='card'><div class='sh'><span class='num'>3</span><div><b>Tech Lead</b><em>Síntese com fonte</em></div></div><ul class='clean'><li><span class='tick'></span><span>RAG nos ADRs antes de pedir um desenho novo. A resposta deve citar o ADR.</span></li><li><span class='tick'></span><span>Peça o rascunho do post-mortem a partir da linha do tempo. Você escreve a ação.</span></li><li><span class='tick'></span><span>Peça a lista de rotas ainda no FAS. Confira no código da fachada.</span></li><li><span class='tick'></span><span>Use a IA para achar tech debt nomeado, não para aprovar o próprio PR.</span></li></ul></article><article class='card'><div class='sh'><span class='num'>4</span><div><b>Prompt que funciona</b><em>Contexto, restrição, prova</em></div></div><div class="snippet"><div class="snippet-bar"><span class="dots"><i></i><i></i><i></i></span>prompt.txt</div><pre>Contexto: ContaCartao.reservar lança
+LimiteInsuficiente se valor &gt; disponivel.
+Tarefa: testes JUnit 5 dessas fronteiras:
+igual, um centavo acima, zero, negativo.
+Restrição: não altere produção.
+Prova: o comando ./mvnw -B test tem que passar.</pre></div></article></div><div class='sol'><div class='sol-h'><b>O QUE REVISAR SEMPRE</b><span class='hint'>A ferramenta não assina</span></div><table><thead><tr><th>Saída</th><th>Risco</th><th>Prova</th></tr></thead><tbody><tr><td>Teste novo</td><td>Afirma o contrário da regra</td><td>Ler o exemplo numerado</td></tr><tr><td>SQL</td><td>Apaga constraint</td><td>Rodar no Testcontainers</td></tr><tr><td>Explicação de legado</td><td>Inventa módulo</td><td>Abrir o copybook</td></tr><tr><td>Pipeline</td><td>Guarda segredo</td><td>Ler o diff do YAML</td></tr></tbody></table></div><div class='check'><h3><span class='tick'></span> CHECKLIST DO USO</h3><div class='check-row'><article><span class='tick'></span><span>Sem PAN e sem senha.</span></article><article><span class='tick'></span><span>Teste roda de verdade.</span></article><article><span class='tick'></span><span>ADR citado quando houver.</span></article><article><span class='tick'></span><span>Diff lido por uma pessoa.</span></article></div></div></div>
+  <div class="foot"><span>Bíblia visual de engenharia, arquitetura e qualidade</span><span>25 / 25</span></div>
+</section></body></html>
